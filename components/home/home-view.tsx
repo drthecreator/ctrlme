@@ -36,11 +36,11 @@ export function HomeView() {
   return (
     <Screen wide>
       <HomeHeader name={state.identity.name} email={state.identity.emails[0]?.address} />
-      <h1 className="sr-only">Ctrl+Me: resumen de tu identidad digital</h1>
-      <div className="hidden px-5 pt-2 pb-5 lg:block" aria-hidden="true">
-        <p className="font-serif text-[2.75rem] leading-tight tracking-tight">
-          Hola{state.identity.name.trim() ? `, ${state.identity.name.trim()}` : ''}
-        </p>
+      <h1 tabIndex={-1} className="px-5 pt-3 pb-2 text-lg font-semibold tracking-tight lg:hidden">Tu resumen</h1>
+      <div className="hidden px-5 pt-2 pb-5 lg:block">
+        <h1 tabIndex={-1} className="font-serif text-[2.75rem] leading-tight tracking-tight">
+          Tu resumen
+        </h1>
         <p className="mt-1 text-base text-muted-foreground">Así está hoy tu identidad digital.</p>
       </div>
 
@@ -78,7 +78,7 @@ export function HomeView() {
         <div className="mt-3 flex justify-center">
           <Link
             href="/evaluacion"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-primary transition-colors hover:bg-muted"
+            className="inline-flex min-h-12 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-primary transition-colors hover:bg-muted"
           >
             {state.assessmentDone ? 'Ver cómo se calcula' : 'Afinar con la evaluación (4 min)'}
             <ArrowRight className="size-4" aria-hidden="true" />

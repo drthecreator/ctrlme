@@ -23,7 +23,12 @@ export function BreachChecklist() {
         <h2 id="acciones-title" className="text-lg font-semibold tracking-tight">
           Acciones recomendadas
         </h2>
-        <p className="text-sm font-medium text-muted-foreground tabular-nums" aria-live="polite">
+        <p
+          className="text-sm font-medium text-muted-foreground tabular-nums"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {completed.length} de {BREACH_STEPS.length}
           <span className="sr-only"> pasos completados</span>
         </p>

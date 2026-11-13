@@ -136,8 +136,9 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
             </Button>
           </div>
 
-          <div key={`${pill.id}-${index}`} className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto py-4" aria-live="polite">
+          <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto py-4">
             <div
+              key={`${pill.id}-${index}`}
               aria-hidden="true"
               className="relative mb-6 flex size-28 shrink-0 items-center justify-center self-start rounded-full bg-primary-foreground/10 motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:duration-500"
             >
@@ -149,7 +150,14 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
             <p className="text-sm font-semibold tracking-[0.12em] text-accent uppercase">
               {index + 1} de {slides.length} · {formatDuration(pill.seconds)}
             </p>
-            <h2 className="mt-2 font-serif text-4xl leading-[1.08] text-balance motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500">
+            <h2
+              aria-live="polite"
+              aria-atomic="true"
+              className="mt-2 font-serif text-4xl leading-[1.08] text-balance motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500"
+            >
+              <span className="sr-only">
+                Diapositiva {index + 1} de {slides.length}.{' '}
+              </span>
               {slide.heading}
             </h2>
             <p className="mt-3 text-lg leading-relaxed text-pretty text-primary-foreground/80">{slide.body}</p>

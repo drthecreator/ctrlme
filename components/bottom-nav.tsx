@@ -171,7 +171,7 @@ export function SideNav() {
 
       <nav aria-label="Navegación principal" className="mt-9 flex flex-col gap-6">
         <div>
-          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/45 uppercase">
+          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
             Tu identidad
           </p>
           <ul className="flex flex-col gap-1">
@@ -181,7 +181,7 @@ export function SideNav() {
           </ul>
         </div>
         <div>
-          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/45 uppercase">
+          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
             Gente de confianza
           </p>
           <ul className="flex flex-col gap-1">

@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { BottomNav, SideNav } from '@/components/bottom-nav'
 import { IdentityProvider, useIdentity } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
@@ -17,6 +18,22 @@ function Frame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { state } = useIdentity()
   const bare = pathname === '/' && !state.onboarded
+  const previousPageRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const heading = Array.from(document.querySelectorAll<HTMLElement>('#contenido h1')).find(
+      (element) => element.getClientRects().length > 0,
+    )
+    if (!heading) return
+
+    const title = heading.textContent?.replace(/\s+/g, ' ').trim()
+    if (title) document.title = `${title} · Ctrl+Me`
+
+    const page = `${pathname}:${state.onboarded}`
+    const shouldMoveFocus = previousPageRef.current !== null && previousPageRef.current !== page
+    previousPageRef.current = page
+    if (shouldMoveFocus) heading.focus()
+  }, [pathname, state.onboarded])
 
   return (
     <div
@@ -38,7 +55,7 @@ function Frame({ children }: { children: React.ReactNode }) {
         )}
       >
         {bare ? null : <SideNav />}
-        <main id="contenido" className="min-h-0 min-w-0 flex-1">
+        <main id="contenido" tabIndex={-1} className="min-h-0 min-w-0 flex-1">
           {children}
         </main>
         <BottomNav />

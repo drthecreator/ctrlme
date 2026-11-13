@@ -285,7 +285,7 @@ export function ChatAssistant() {
           <Sparkles className="size-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h1 className="font-serif text-[1.5rem] leading-none tracking-tight">Asistente</h1>
+          <h1 tabIndex={-1} className="font-serif text-[1.5rem] leading-none tracking-tight">Asistente</h1>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
             En línea · Escribe o habla

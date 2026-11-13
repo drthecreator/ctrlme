@@ -65,7 +65,7 @@
   --success: oklch(0.48 0.11 158);
   --success-soft: oklch(0.955 0.04 158);
   --border: oklch(0.9 0.008 85);
-  --input: oklch(0.88 0.008 85);
+  --input: oklch(0.62 0.008 85);
   --ring: oklch(0.52 0.13 262);
   --radius: 0.75rem;
 }

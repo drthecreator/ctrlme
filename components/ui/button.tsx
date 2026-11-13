@@ -24,7 +24,7 @@ const buttonVariants = cva(
         touch:
           "h-12 gap-2 rounded-2xl px-5 text-base font-semibold [&_svg:not([class*='size-'])]:size-5",
         'touch-sm':
-          'h-11 gap-2 rounded-xl px-4 text-[0.9375rem] font-semibold',
+          'h-12 gap-2 rounded-xl px-4 text-[0.9375rem] font-semibold',
         default:
           'h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",

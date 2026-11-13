@@ -114,7 +114,7 @@ export function SessionAssistant() {
         </div>
       ) : null}
 
-      <div aria-live="polite">
+      <div role="status" aria-live="polite" aria-atomic="true">
         {phase.type === 'intro' ? (
           <Panel align="start">
             <IconBadge icon={ShieldCheck} />

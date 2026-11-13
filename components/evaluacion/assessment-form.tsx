@@ -378,7 +378,7 @@ export function AssessmentForm() {
         </h2>
         <div className="flex items-center gap-4">
           <ScoreRing score={total} />
-          <div aria-live="polite">
+          <div role="status" aria-live="polite" aria-atomic="true">
             <p className="text-sm text-muted-foreground">Tu puntuación</p>
             <p className="sr-only">{total} de 100.</p>
             <p className={cn('mt-0.5 font-serif text-[1.75rem] leading-tight', toneStyles[level.tone].text)}>

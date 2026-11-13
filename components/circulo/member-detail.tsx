@@ -79,7 +79,7 @@ export function MemberDetail({ id }: { id: string }) {
       <header className="flex items-center gap-4 px-5 pt-2 pb-5">
         <Avatar name={member.name} size="lg" />
         <div className="min-w-0">
-          <h1 className="font-serif text-[2rem] leading-tight tracking-tight lg:text-4xl">{member.name}</h1>
+          <h1 tabIndex={-1} className="font-serif text-[2rem] leading-tight tracking-tight lg:text-4xl">{member.name}</h1>
           <p className="text-sm text-muted-foreground">
             {member.relation} · {member.email}
           </p>

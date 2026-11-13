@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   ArrowRight,
   AtSign,
@@ -27,7 +27,7 @@ type Step = 'welcome' | 'email' | 'code' | 'connect' | 'scan'
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export const fieldClass =
-  'h-13 w-full rounded-2xl border border-input bg-card px-4 text-base outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/40 aria-invalid:border-destructive aria-invalid:ring-destructive/20'
+  'h-13 w-full rounded-2xl border border-input bg-card px-4 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/40 aria-invalid:border-destructive aria-invalid:ring-destructive/20'
 
 export function OnboardingFlow() {
   const { completeOnboarding } = useIdentity()
@@ -39,8 +39,24 @@ export function OnboardingFlow() {
     instagram: '',
     googleConnected: false,
   })
+  const [verificationCode, setVerificationCode] = useState('')
+  const previousStepRef = useRef<Step | null>(null)
 
   const email = identity.emails[0]?.address ?? ''
+
+  useEffect(() => {
+    const heading = Array.from(document.querySelectorAll<HTMLElement>('#contenido h1')).find(
+      (element) => element.getClientRects().length > 0,
+    )
+    if (!heading) return
+
+    const title = heading.textContent?.replace(/\s+/g, ' ').trim()
+    if (title) document.title = `${title} · Ctrl+Me`
+
+    const shouldMoveFocus = previousStepRef.current !== null && previousStepRef.current !== step
+    previousStepRef.current = step
+    if (shouldMoveFocus) heading.focus()
+  }, [step])
 
   if (step === 'welcome') return <Welcome onStart={() => setStep('email')} />
 
@@ -68,7 +84,12 @@ export function OnboardingFlow() {
       {step === 'code' ? (
         <CodeStep
           email={email}
-          onChangeEmail={() => setStep('email')}
+          code={verificationCode}
+          onCodeChange={setVerificationCode}
+          onChangeEmail={() => {
+            setVerificationCode('')
+            setStep('email')
+          }}
           onVerified={() => {
             setIdentity((i) => ({ ...i, emails: i.emails.map((e) => ({ ...e, verified: true })) }))
             setStep('connect')
@@ -113,7 +134,7 @@ function Welcome({ onStart }: { onStart: () => void }) {
             </span>
           </div>
           <p className="mt-8 text-sm font-semibold tracking-[0.12em] text-muted-foreground uppercase">Ctrl+Me</p>
-          <h1 className="mt-2 font-serif text-[2.75rem] leading-[1.02] tracking-tight text-balance lg:text-6xl">
+          <h1 tabIndex={-1} className="mt-2 font-serif text-[2.75rem] leading-[1.02] tracking-tight text-balance lg:text-6xl">
             Tu identidad digital, bajo control.
           </h1>
           <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground lg:mt-5 lg:text-lg">
@@ -157,13 +178,13 @@ function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex min-h-11 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
+        className="inline-flex min-h-12 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
       >
         <ChevronLeft className="size-5" aria-hidden="true" />
         Volver
       </button>
       <div className="ml-auto flex items-center gap-2 pr-2">
-        <span className="text-sm text-muted-foreground tabular-nums">
+        <span className="text-sm text-muted-foreground tabular-nums" aria-live="polite" aria-atomic="true">
           Paso {index} de 3
         </span>
         <span className="flex gap-1" aria-hidden="true">
@@ -180,7 +201,7 @@ function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
 function StepIntro({ title, text }: { title: string; text: React.ReactNode }) {
   return (
     <header className="px-6 pt-4 pb-6">
-      <h1 className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance">{title}</h1>
+      <h1 tabIndex={-1} className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance">{title}</h1>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{text}</p>
     </header>
   )
@@ -200,6 +221,13 @@ function EmailStep({
   const [email, setEmail] = useState(initialEmail)
   const [consent, setConsent] = useState(Boolean(initialEmail))
   const [errors, setErrors] = useState<{ email?: string; consent?: string }>({})
+  const emailRef = useRef<HTMLInputElement>(null)
+  const consentRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (errors.email) emailRef.current?.focus()
+    else if (errors.consent) consentRef.current?.focus()
+  }, [errors])
 
   return (
     <form
@@ -240,9 +268,11 @@ function EmailStep({
         <Mail className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <input
           id={`${id}-email`}
+          ref={emailRef}
           type="email"
           inputMode="email"
           autoComplete="email"
+          required
           autoCapitalize="none"
           spellCheck={false}
           value={email}
@@ -265,9 +295,12 @@ function EmailStep({
 
       <label className="relative mt-6 flex cursor-pointer items-start gap-3 rounded-2xl bg-secondary/60 p-4 has-focus-visible:ring-3 has-focus-visible:ring-ring/40">
         <input
+          ref={consentRef}
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
+          required
+          aria-invalid={errors.consent ? true : undefined}
           aria-describedby={errors.consent ? `${id}-consent-error` : undefined}
           className="peer sr-only"
         />
@@ -299,14 +332,17 @@ function EmailStep({
 
 function CodeStep({
   email,
+  code,
+  onCodeChange,
   onChangeEmail,
   onVerified,
 }: {
   email: string
+  code: string
+  onCodeChange: (value: string) => void
   onChangeEmail: () => void
   onVerified: () => void
 }) {
-  const [code, setCode] = useState('')
   const [resent, setResent] = useState(false)
 
   return (
@@ -325,12 +361,12 @@ function CodeStep({
       <InputOTP
         maxLength={6}
         value={code}
-        onChange={setCode}
+        onChange={onCodeChange}
         inputMode="numeric"
         pattern="^[0-9]*$"
         autoComplete="one-time-code"
         aria-label="Código de verificación de 6 dígitos"
-        autoFocus
+        aria-describedby="verification-code-hint"
         containerClassName="justify-center"
       >
         <InputOTPGroup className="gap-2">
@@ -344,7 +380,7 @@ function CodeStep({
         </InputOTPGroup>
       </InputOTP>
 
-      <p className="mt-4 text-center text-sm text-muted-foreground">
+      <p id="verification-code-hint" className="mt-4 text-center text-sm text-muted-foreground">
         Prototipo: cualquier código de 6 dígitos funciona.
       </p>
 
@@ -484,7 +520,10 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
   const finished = completed >= checks.length
 
   useEffect(() => {
-    if (finished) return
+    if (finished) {
+      document.title = 'Análisis completado · Ctrl+Me'
+      return
+    }
     const timer = setTimeout(() => setCompleted((c) => c + 1), 1100)
     return () => clearTimeout(timer)
   }, [completed, finished])
@@ -509,11 +548,17 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
         </span>
       </div>
 
-      <h1 className="mt-6 text-center font-serif text-[2.25rem] leading-tight tracking-tight">
+      <h1 tabIndex={-1} className="mt-6 text-center font-serif text-[2.25rem] leading-tight tracking-tight">
         {finished ? 'Análisis completado' : 'Analizando tu huella'}
       </h1>
-      <p className="mt-1 text-center text-[0.9375rem] text-muted-foreground" aria-live="polite">
+      <p
+        className="mt-1 text-center text-[0.9375rem] text-muted-foreground"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {finished ? 'Ya tenemos tu primera puntuación.' : `${completed + 1} de ${checks.length} comprobaciones`}
+        {!finished ? <span className="sr-only">: {checks[completed]?.label}</span> : null}
       </p>
 
       <ol className="surface mt-8 overflow-hidden rounded-3xl">
@@ -523,6 +568,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
           return (
             <li
               key={check.label}
+              aria-current={active ? 'step' : undefined}
               className={cn(
                 'flex items-start gap-3 border-b border-border/70 p-4 transition-opacity last:border-b-0',
                 !done && !active && 'opacity-45',

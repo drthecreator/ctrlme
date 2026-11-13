@@ -30,14 +30,14 @@ export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderPr
       <div className="sticky top-0 z-10 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-1 lg:pt-3">
         <Link
           href={backHref}
-          className="inline-flex min-h-11 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
+          className="inline-flex min-h-12 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
         >
           <ChevronLeft className="size-5" aria-hidden="true" />
           Volver
         </Link>
       </div>
       <header className="px-5 pt-1 pb-5">
-        <h1 className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance lg:text-[2.75rem]">
+        <h1 tabIndex={-1} className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance lg:text-[2.75rem]">
           {title}
         </h1>
         {subtitle ? (
