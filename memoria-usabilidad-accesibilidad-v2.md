@@ -6,6 +6,31 @@
 
 > **Trazabilidad:** para esta memoria se toma como v1.0 el estado del código inspeccionado antes de esta intervención. No se encontró una etiqueta o compilación archivada de v1.0 que permita comparar cada pantalla completa; por tanto, se documentan únicamente las diferencias comprobables incorporadas ahora y se distingue lo que ya existía.
 
+## Qué se añadió en la aplicación durante esta conversación
+
+Esta lista identifica cambios concretos del sitio, no principios generales. Los textos de progreso y varios controles ya estaban visibles; cuando corresponde, se indica que lo nuevo fue su comportamiento accesible, no la creación del texto o de una pantalla.
+
+### Cambios visibles
+
+- **Inicio/resumen:** ahora hay un encabezado visible «Tu resumen» tanto en móvil como en escritorio. Antes, el encabezado accesible estaba oculto visualmente y en escritorio se mostraba un saludo «Hola».
+- **Legibilidad:** los bordes neutros de los campos se oscurecieron y los placeholders dejaron de llevar opacidad adicional. En la navegación lateral, los rótulos de grupo pasaron de 45 % a 75 % de opacidad.
+- **Área de activación:** «Volver», los botones `touch-sm` y el enlace secundario del resumen pasaron de 44 px a 48 px de alto. La navegación móvil (56 px) y la lateral (48 px) ya tenían esas dimensiones: se conservaron, no se añadieron ahora.
+
+### Cambios de comportamiento y semántica
+
+- **Onboarding:** el indicador «Paso X de 3» ya existía; ahora se anuncia cuando cambia y el foco pasa al encabezado de la nueva etapa. Si el formulario falla, el foco llega al primer campo que hay que corregir; se hicieron explícitos como obligatorios el correo y el consentimiento. El código de verificación se conserva al retroceder y su instrucción queda asociada al control. Antes, el código se reiniciaba al volver y el campo recibía foco automático al entrar.
+- **Navegación entre páginas:** al cambiar de ruta, el título del documento se actualiza con el encabezado de la página y el foco pasa a ese encabezado. El enlace «Saltar al contenido» ya existía; ahora su destino `main` puede recibir foco de forma nativa.
+- **Estados dinámicos:** los textos de progreso del análisis y los contadores/resultados ya eran visibles; ahora se marcan como estados anunciables y el análisis comunica también cuál comprobación está activa. Se añadieron anuncios estables para los cambios de diapositiva de las historias y para el asistente guiado.
+- **Encabezados de página:** los `h1` que reciben foco durante la navegación se declaran con `tabIndex={-1}` en React; antes no estaban preparados para ese foco programático.
+
+### Elementos que ya estaban y no se añadieron en esta conversación
+
+- Etiquetas visibles e instrucciones básicas de los campos, mensajes de error en texto y navegación con `aria-current="page"`.
+- Enlace «Saltar al contenido», landmarks `main` y `nav`, y estilos globales de foco `:focus-visible`.
+- Compatibilidad con `prefers-reduced-motion`, composición responsive, navegación inferior/lateral y controles explícitos para activar la narración de historias.
+
+En resumen: no se creó un flujo nuevo ni se rediseñó la interfaz. Se modificaron el encabezado del resumen, el contraste y tamaño de algunos controles, y el comportamiento de foco y anuncios de estados en flujos que ya existían.
+
 ## Usabilidad
 
 Se organizan las mejoras conforme a los tres ejes de ISO 9241-11 —eficacia, eficiencia y satisfacción— y se relacionan con los subprincipios de la lista, como visibilidad del estado, prevención y recuperación de errores, control del usuario, reconocimiento y consistencia. La intención no fue rediseñar el prototipo, sino reducir dudas y errores dentro de los flujos actuales.
