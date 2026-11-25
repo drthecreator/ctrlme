@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { createSeedCircle, type CircleState } from '@/lib/circle'
+import { usePrototype } from '@/lib/prototype-context'
 
 export type Frequency = 'nunca' | 'ocasional' | 'diario'
 
@@ -641,14 +642,27 @@ type IdentityContextValue = {
 const IdentityContext = createContext<IdentityContextValue | null>(null)
 
 export function IdentityProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<IdentityState>(initialState)
+  const { version } = usePrototype()
+  const [v2State, setV2State] = useState<IdentityState>(initialState)
+  const [v3State, setV3State] = useState<IdentityState>(initialState)
+  const state = version === 'v3' ? v3State : v2State
 
-  const update = useCallback((fn: (state: IdentityState) => IdentityState) => setState(fn), [])
+  const update = useCallback((fn: (state: IdentityState) => IdentityState) => {
+    if (version === 'v3') setV3State(fn)
+    else setV2State(fn)
+  }, [version])
   const completeOnboarding = useCallback(
-    (identity: Identity) => setState((s) => ({ ...s, identity, onboarded: true, scannedAt: Date.now() })),
-    [],
+    (identity: Identity) => {
+      const updateState = (current: IdentityState) => ({ ...current, identity, onboarded: true, scannedAt: Date.now() })
+      if (version === 'v3') setV3State(updateState)
+      else setV2State(updateState)
+    },
+    [version],
   )
-  const reset = useCallback(() => setState(initialState), [])
+  const reset = useCallback(() => {
+    if (version === 'v3') setV3State(initialState)
+    else setV2State(initialState)
+  }, [version])
 
   const value = useMemo(() => ({ state, update, completeOnboarding, reset }), [state, update, completeOnboarding, reset])
 

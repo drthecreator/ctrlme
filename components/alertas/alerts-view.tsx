@@ -4,9 +4,13 @@ import Link from 'next/link'
 import { ChevronRight, Mail, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { BreachChecklist } from '@/components/alertas/breach-checklist'
 import { BREACH, formatRelative, useIdentity } from '@/lib/identity-store'
+import { localize, usePrototype } from '@/lib/prototype-context'
 
 export function AlertsView() {
   const { state } = useIdentity()
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   const emails = state.identity.emails
 
   return (
@@ -20,12 +24,12 @@ export function AlertsView() {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-xs text-muted-foreground">
-            Vigilando {emails.length} {emails.length === 1 ? 'correo' : 'correos'} · revisado{' '}
+            {copy('Vigilando')} {emails.length} {copy(emails.length === 1 ? 'correo' : 'correos')} · {copy('revisado')}{' '}
             {formatRelative(state.scannedAt, Date.now())}
           </span>
           <span className="block truncate text-[0.9375rem] font-medium">{emails.map((e) => e.address).join(', ')}</span>
         </span>
-        <span className="text-sm font-semibold text-primary">Gestionar</span>
+        <span className="text-sm font-semibold text-primary">{copy('Gestionar')}</span>
         <ChevronRight className="-ml-2 size-4 text-primary" aria-hidden="true" />
       </Link>
 
@@ -35,9 +39,9 @@ export function AlertsView() {
             <ShieldCheck className="size-5" aria-hidden="true" />
           </span>
           <div>
-            <h2 className="font-serif text-[1.625rem] leading-tight">Sin filtraciones activas</h2>
+            <h2 className="font-serif text-[1.625rem] leading-tight">{copy('Sin filtraciones activas')}</h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Resolviste la filtración de {BREACH.service}. Te avisaremos al momento si aparece algo nuevo.
+              {copy('Resolviste la filtración de')} {BREACH.service}. {copy('Te avisaremos al momento si aparece algo nuevo.')}
             </p>
           </div>
         </section>
@@ -51,25 +55,25 @@ export function AlertsView() {
               <TriangleAlert className="size-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-xs font-semibold tracking-[0.12em] text-destructive uppercase">Requiere acción</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-destructive uppercase">{copy('Requiere acción')}</p>
               <h2 id="filtracion-title" className="mt-0.5 font-serif text-[1.625rem] leading-tight">
-                1 filtración detectada
+                {copy('1 filtración detectada')}
               </h2>
             </div>
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-3 border-t border-destructive/15 pt-4 text-sm">
             <div>
-              <dt className="text-muted-foreground">Servicio</dt>
+              <dt className={isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}>{copy('Servicio')}</dt>
               <dd className="mt-0.5 font-semibold">
                 {BREACH.service} ({BREACH.year})
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Detectada</dt>
+              <dt className={isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}>{copy('Detectada')}</dt>
               <dd className="mt-0.5 font-semibold">{BREACH.detectedOn}</dd>
             </div>
             <div className="col-span-2">
-              <dt className="text-muted-foreground">Datos expuestos</dt>
+              <dt className={isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}>{copy('Datos expuestos')}</dt>
               <dd className="mt-1.5 flex flex-wrap gap-1.5">
                 {BREACH.data.map((item) => (
                   <span key={item} className="rounded-full bg-card px-2.5 py-1 text-xs font-semibold">
@@ -79,8 +83,8 @@ export function AlertsView() {
               </dd>
             </div>
           </dl>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Afectó a {BREACH.affected}. Correo: {emails[0]?.address}
+          <p className={`mt-3 text-xs ${isV3 ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {copy('Afectó a')} {BREACH.affected}. {copy('Correo')}: {emails[0]?.address}
           </p>
         </section>
       )}

@@ -4,19 +4,24 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { BottomNav, SideNav } from '@/components/bottom-nav'
 import { IdentityProvider, useIdentity } from '@/lib/identity-store'
+import { PrototypeProvider, usePrototypeCopy } from '@/lib/prototype-context'
+import { PrototypeControls } from '@/components/prototype-controls'
 import { cn } from '@/lib/utils'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <IdentityProvider>
-      <Frame>{children}</Frame>
-    </IdentityProvider>
+    <PrototypeProvider>
+      <IdentityProvider>
+        <Frame>{children}</Frame>
+      </IdentityProvider>
+    </PrototypeProvider>
   )
 }
 
 function Frame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { state } = useIdentity()
+  const copy = usePrototypeCopy()
   const bare = pathname === '/' && !state.onboarded
   const previousPageRef = useRef<string | null>(null)
 
@@ -39,11 +44,12 @@ function Frame({ children }: { children: React.ReactNode }) {
     <div
       className={cn('min-h-dvh', !bare && 'sm:flex sm:items-center sm:justify-center sm:py-8 lg:block lg:min-h-0 lg:py-0')}
     >
+      <PrototypeControls />
       <a
         href="#contenido"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-3 focus:text-primary-foreground"
       >
-        Saltar al contenido
+        {copy('Saltar al contenido')}
       </a>
       <div
         id="app-frame"

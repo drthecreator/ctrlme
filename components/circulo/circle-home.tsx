@@ -21,10 +21,14 @@ import {
 } from '@/lib/circle'
 import { useIdentity } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototype, usePrototypeCopy } from '@/lib/prototype-context'
 
 export function CircleHome() {
   const { state, update } = useIdentity()
+  const isV3 = usePrototype().version === 'v3'
+  const copy = usePrototypeCopy()
   const [inviting, setInviting] = useState(false)
+  const [pendingRevoke, setPendingRevoke] = useState<Grant | null>(null)
   const { members, incoming, grants } = state.circle
 
   const accept = (request: IncomingRequest) =>
@@ -57,7 +61,7 @@ export function CircleHome() {
     <div className="space-y-7 pb-4">
       {incoming.length > 0 ? (
         <section aria-labelledby="solicitudes">
-          <SectionTitle id="solicitudes">Solicitudes recibidas</SectionTitle>
+          <SectionTitle id="solicitudes">{copy('Solicitudes recibidas')}</SectionTitle>
           <ul className="space-y-3 px-5">
             {incoming.map((request) => (
               <li key={request.id}>
@@ -78,15 +82,15 @@ export function CircleHome() {
               className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
             >
               <UserPlus className="size-4" aria-hidden="true" />
-              Añadir persona
+              {copy('Añadir persona')}
             </button>
           }
         >
-          Personas que cuido
+          {copy('Personas que cuido')}
         </SectionTitle>
         {members.length === 0 ? (
           <p className="mx-5 rounded-3xl border border-dashed border-border p-6 text-center text-sm leading-relaxed text-muted-foreground">
-            Aún no cuidas la identidad de nadie. Invita a un familiar: solo verás lo que te permita compartir.
+            {copy('Aún no cuidas la identidad de nadie. Invita a un familiar: solo verás lo que te permita compartir.')}
           </p>
         ) : (
           <ul className="grid gap-3 px-5 lg:grid-cols-2">
@@ -100,16 +104,19 @@ export function CircleHome() {
       </section>
 
       <section aria-labelledby="cuidan">
-        <SectionTitle id="cuidan">Quién cuida de mí</SectionTitle>
+        <SectionTitle id="cuidan">{copy('Quién cuida de mí')}</SectionTitle>
         {grants.length === 0 ? (
           <p className="mx-5 rounded-3xl border border-dashed border-border p-6 text-center text-sm leading-relaxed text-muted-foreground">
-            Nadie tiene acceso a tu identidad digital. Tú decides si eso cambia.
+            {copy('Nadie tiene acceso a tu identidad digital. Tú decides si eso cambia.')}
           </p>
         ) : (
           <ul className="grid gap-3 px-5 lg:grid-cols-2">
             {grants.map((grant) => (
               <li key={grant.id}>
-                <GrantCard grant={grant} onRevoke={() => revoke(grant.id)} />
+                <GrantCard grant={grant} onRevoke={() => {
+                  if (isV3) setPendingRevoke(grant)
+                  else revoke(grant.id)
+                }} />
               </li>
             ))}
           </ul>
@@ -117,12 +124,24 @@ export function CircleHome() {
         <p className="mx-5 mt-3 flex items-start gap-3 rounded-2xl bg-success-soft p-4 text-sm leading-relaxed text-success">
           <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>
-            Nadie ve tus contraseñas ni tus mensajes. Puedes retirar un permiso cuando quieras.
+            {copy('Nadie ve tus contraseñas ni tus mensajes. Puedes retirar un permiso cuando quieras.')}
           </span>
         </p>
       </section>
 
       <InviteSheet open={inviting} onClose={() => setInviting(false)} />
+      {pendingRevoke ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingRevoke(null) }}>
+          <section role="alertdialog" aria-modal="true" aria-labelledby="revoke-title" aria-describedby="revoke-description" className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+            <h2 id="revoke-title" className="text-xl font-semibold">{copy('¿Retirar el acceso?')}</h2>
+            <p id="revoke-description" className="mt-2 text-sm leading-relaxed text-muted-foreground">{pendingRevoke.name} {copy('dejará de ver la información que compartes. Puedes volver a invitarle más adelante.')}</p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button id="revoke-cancel" type="button" autoFocus onClick={() => setPendingRevoke(null)} className="min-h-11 rounded-xl border border-border bg-card px-4 text-sm font-semibold">{copy('Cancelar')}</button>
+              <button type="button" onClick={() => { revoke(pendingRevoke.id); setPendingRevoke(null) }} className="min-h-11 rounded-xl bg-destructive px-4 text-sm font-semibold text-white">{copy('Retirar acceso')}</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -136,6 +155,7 @@ function RequestCard({
   onAccept: () => void
   onDecline: () => void
 }) {
+  const copy = usePrototypeCopy()
   return (
     <div className="surface rounded-3xl border-l-4 border-accent p-4">
       <div className="flex items-center gap-3">
@@ -143,12 +163,12 @@ function RequestCard({
         <div className="min-w-0">
           <p className="font-semibold">{request.name}</p>
           <p className="text-sm text-muted-foreground">
-            {request.relation} · {when(request.at)}
+            {copy(request.relation)} · {copy(when(request.at))}
           </p>
         </div>
       </div>
       <p className="mt-3 text-sm leading-relaxed">
-        Quiere poder cuidar de tu identidad digital. Si aceptas, esta persona podrá:
+        {copy('Quiere poder cuidar de tu identidad digital. Si aceptas, esta persona podrá:')}
       </p>
       <div className="mt-2">
         <ScopeChips scopes={request.scopes} />
@@ -159,14 +179,14 @@ function RequestCard({
           onClick={onDecline}
           className="min-h-12 rounded-2xl border border-border text-[0.9375rem] font-semibold transition-colors hover:bg-muted"
         >
-          Rechazar
+          {copy('Rechazar')}
         </button>
         <button
           type="button"
           onClick={onAccept}
           className="min-h-12 rounded-2xl bg-primary text-[0.9375rem] font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
         >
-          Aceptar
+          {copy('Aceptar')}
         </button>
       </div>
     </div>
@@ -174,6 +194,7 @@ function RequestCard({
 }
 
 function MemberCard({ member }: { member: CircleMember }) {
+  const copy = usePrototypeCopy()
   const pending = member.status === 'pendiente'
   const score = memberScore(member)
   const level = getLevel(score)
@@ -188,27 +209,27 @@ function MemberCard({ member }: { member: CircleMember }) {
       <Avatar name={member.name} />
       <span className="min-w-0 flex-1">
         <span className="block truncate font-semibold">{member.name}</span>
-        <span className="block text-sm text-muted-foreground">{member.relation}</span>
+        <span className="block text-sm text-muted-foreground">{copy(member.relation)}</span>
         {pending ? (
           <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2.5 py-1 text-xs font-semibold text-warning">
             <Clock className="size-3.5" aria-hidden="true" />
-            Esperando su aprobación
+            {copy('Esperando su aprobación')}
           </span>
         ) : open ? (
           <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-destructive-soft px-2.5 py-1 text-xs font-semibold text-destructive">
             <ShieldAlert className="size-3.5" aria-hidden="true" />
-            Filtración en {member.breach}
+            {copy('Filtración en')} {member.breach}
           </span>
         ) : (
           <span className="mt-1.5 block text-xs text-muted-foreground">
-            {todo > 0 ? `${todo} ${todo === 1 ? 'tarea pendiente' : 'tareas pendientes'}` : 'Todo al día'}
+            {todo > 0 ? `${todo} ${copy(todo === 1 ? 'tarea pendiente' : 'tareas pendientes')}` : copy('Todo al día')}
           </span>
         )}
       </span>
       {pending ? null : (
         <span className="flex shrink-0 flex-col items-center">
           <span className="font-serif text-3xl leading-none">{score}</span>
-          <span className={cn('mt-1 text-xs font-semibold', toneStyles[level.tone].text)}>{level.label}</span>
+          <span className={cn('mt-1 text-xs font-semibold', toneStyles[level.tone].text)}>{copy(level.label)}</span>
         </span>
       )}
       <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -217,6 +238,7 @@ function MemberCard({ member }: { member: CircleMember }) {
 }
 
 function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) {
+  const copy = usePrototypeCopy()
   return (
     <div className="surface rounded-3xl p-4">
       <div className="flex items-center gap-3">
@@ -224,7 +246,7 @@ function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) 
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{grant.name}</p>
           <p className="text-sm text-muted-foreground">
-            {grant.relation} · desde {when(grant.since).replace('hace ', '')}
+            {copy(grant.relation)} · {copy('desde')} {when(grant.since).replace('hace ', '')}
           </p>
         </div>
       </div>
@@ -244,6 +266,7 @@ function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) 
 
 function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { update } = useIdentity()
+  const copy = usePrototypeCopy()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [relation, setRelation] = useState<string>(RELATIONS[0])
@@ -268,29 +291,29 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="Añadir persona a mi círculo">
+    <BottomSheet open={open} onClose={onClose} title={copy('Añadir persona a mi círculo')}>
       <form onSubmit={submit} className="space-y-4 pb-2">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Le enviaremos una solicitud. No verás nada suyo hasta que la acepte.
+          {copy('Le enviaremos una solicitud. No verás nada suyo hasta que la acepte.')}
         </p>
 
         <div>
           <label htmlFor="c-name" className="text-sm font-semibold">
-            Nombre
+            {copy('Nombre')}
           </label>
           <input
             id="c-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoComplete="off"
-            placeholder="Por ejemplo, Carmen"
+            placeholder={copy('Por ejemplo, Carmen')}
             className={cn(fieldClass, 'mt-2')}
           />
         </div>
 
         <div>
           <label htmlFor="c-email" className="text-sm font-semibold">
-            Su correo electrónico
+            {copy('Su correo electrónico')}
           </label>
           <input
             id="c-email"
@@ -306,7 +329,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
 
         <div>
           <label htmlFor="c-rel" className="text-sm font-semibold">
-            ¿Qué es para ti?
+            {copy('¿Qué es para ti?')}
           </label>
           <select
             id="c-rel"
@@ -316,14 +339,14 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           >
             {RELATIONS.map((r) => (
               <option key={r} value={r}>
-                {r}
+                {copy(r)}
               </option>
             ))}
           </select>
         </div>
 
         <fieldset>
-          <legend className="text-sm font-semibold">¿Qué le pedirás poder hacer?</legend>
+          <legend className="text-sm font-semibold">{copy('¿Qué le pedirás poder hacer?')}</legend>
           <div className="mt-2 space-y-2">
             {CIRCLE_SCOPES.map((scope) => (
               <label
@@ -337,8 +360,8 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
                   className="mt-0.5 size-5 shrink-0 accent-primary"
                 />
                 <span>
-                  <span className="block text-[0.9375rem] font-semibold">{scope.label}</span>
-                  <span className="block text-sm leading-snug text-muted-foreground">{scope.description}</span>
+                  <span className="block text-[0.9375rem] font-semibold">            {copy(scope.label)}</span>
+                  <span className="block text-sm leading-snug text-muted-foreground">{copy(scope.description)}</span>
                 </span>
               </label>
             ))}
@@ -352,7 +375,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
             onChange={(e) => setAgreed(e.target.checked)}
             className="mt-0.5 size-5 shrink-0 accent-primary"
           />
-          <span>Confirmo que esta persona me ha dado permiso para pedirle acceso.</span>
+          <span>{copy('Confirmo que esta persona me ha dado permiso para pedirle acceso.')}</span>
         </label>
 
         <button
@@ -360,7 +383,7 @@ function InviteSheet({ open, onClose }: { open: boolean; onClose: () => void }) 
           disabled={!ready}
           className="min-h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground transition-opacity disabled:opacity-40"
         >
-          Enviar solicitud
+          {copy('Enviar solicitud')}
         </button>
       </form>
     </BottomSheet>

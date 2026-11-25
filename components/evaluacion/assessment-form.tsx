@@ -9,6 +9,7 @@ import { ReviewStep } from '@/components/evaluacion/review-step'
 import { computeScore, hasAnyNetwork, useIdentity, type Answers } from '@/lib/identity-store'
 import { getLevel, toneStyles } from '@/lib/score'
 import { cn } from '@/lib/utils'
+import { localize, usePrototype } from '@/lib/prototype-context'
 
 type Option<V extends string> = { value: V; label: string; hint?: string }
 
@@ -30,6 +31,9 @@ const STEPS = [
 export function AssessmentForm() {
   const router = useRouter()
   const { state, update } = useIdentity()
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   const [step, setStep] = useState(0)
   const topRef = useRef<HTMLDivElement>(null)
   const answers = state.answers
@@ -50,10 +54,11 @@ export function AssessmentForm() {
   return (
     <div className="px-5">
       <div ref={topRef} tabIndex={-1} className="scroll-mt-20 outline-none">
+        {isV3 ? <p role="status" className="mb-3 flex items-center gap-1.5 text-xs font-medium text-success"><Check className="size-3.5" aria-hidden="true" />{copy('Guardado automático')}</p> : null}
         <div className="flex items-baseline justify-between text-sm">
           <p className="font-semibold">
-            Paso {step + 1} de {STEPS.length}
-            <span className="font-normal text-muted-foreground"> · {STEPS[step].title}</span>
+            {copy('Paso')} {step + 1} {copy('de')} {STEPS.length}
+            <span className="font-normal text-muted-foreground"> · {copy(STEPS[step].title)}</span>
           </p>
           <p className="text-muted-foreground tabular-nums" aria-hidden="true">
             {Math.round(progress)}%
@@ -61,7 +66,7 @@ export function AssessmentForm() {
         </div>
         <div
           role="progressbar"
-          aria-label="Progreso de la evaluación"
+          aria-label={copy('Progreso de la evaluación')}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress)}
@@ -78,7 +83,7 @@ export function AssessmentForm() {
         <>
           <p className="mt-5 flex items-start gap-2.5 rounded-2xl bg-secondary/70 p-3.5 text-sm leading-relaxed text-secondary-foreground">
             <ScanSearch className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            Hemos rellenado algunas respuestas con lo que encontró el análisis. Corrígelas si no son exactas.
+            {copy('Hemos rellenado algunas respuestas con lo que encontró el análisis. Corrígelas si no son exactas.')}
           </p>
           <Question title="¿Qué redes utilizas habitualmente?">
             <Segmented
@@ -374,13 +379,13 @@ export function AssessmentForm() {
 
       <section aria-labelledby="resultado-title" className="surface mt-8 rounded-3xl p-5">
         <h2 id="resultado-title" className="sr-only">
-          {isLast ? 'Resultado final' : 'Resultado provisional'}
+          {copy(isLast ? 'Resultado final' : 'Resultado provisional')}
         </h2>
         <div className="flex items-center gap-4">
           <ScoreRing score={total} />
           <div role="status" aria-live="polite" aria-atomic="true">
-            <p className="text-sm text-muted-foreground">Tu puntuación</p>
-            <p className="sr-only">{total} de 100.</p>
+            <p className="text-sm text-muted-foreground">{copy('Tu puntuación')}</p>
+            <p className="sr-only">{total} {copy('de 100')}.</p>
             <p className={cn('mt-0.5 font-serif text-[1.75rem] leading-tight', toneStyles[level.tone].text)}>
               {level.label}
             </p>
@@ -408,7 +413,7 @@ export function AssessmentForm() {
         </dl>
         <p className="mt-4 flex items-start gap-2 border-t border-border/70 pt-4 text-xs leading-relaxed text-muted-foreground">
           <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          Combina tus respuestas con el análisis automático de filtraciones, sesiones y cuentas inactivas.
+          {copy('Combina tus respuestas con el análisis automático de filtraciones, sesiones y cuentas inactivas.')}
         </p>
       </section>
 
@@ -416,7 +421,7 @@ export function AssessmentForm() {
         {step > 0 ? (
           <Button variant="outline" size="touch" className="shrink-0" onClick={() => goTo(step - 1)}>
             <ArrowLeft aria-hidden="true" />
-            <span className="sr-only">Paso anterior</span>
+            <span className="sr-only">{copy('Paso anterior')}</span>
           </Button>
         ) : null}
         <Button
@@ -428,7 +433,7 @@ export function AssessmentForm() {
             router.push('/plan')
           }}
         >
-          {isLast ? 'Confirmar y ver mi plan' : `Siguiente: ${STEPS[step + 1].short}`}
+          {isLast ? copy('Confirmar y ver mi plan') : `${copy('Siguiente:')} ${copy(STEPS[step + 1].short)}`}
           <ArrowRight aria-hidden="true" />
         </Button>
       </div>
@@ -460,10 +465,12 @@ function OftenChoice({
 }
 
 function Question({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  const { version, language } = usePrototype()
+  const copyQuestion = (text: string) => version === 'v3' ? localize(text, language) : text
   return (
     <fieldset className="mt-7">
-      <legend className="text-lg font-semibold tracking-tight text-balance">{title}</legend>
-      {hint ? <p className="mt-1 text-sm text-muted-foreground">{hint}</p> : null}
+      <legend className="text-lg font-semibold tracking-tight text-balance">{copyQuestion(title)}</legend>
+      {hint ? <p className="mt-1 text-sm text-muted-foreground">{copyQuestion(hint)}</p> : null}
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </fieldset>
   )
@@ -487,24 +494,27 @@ function Segmented<V extends string>({
   detected?: string
 }) {
   const labelId = `${name}-label`
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   return (
     <div role="radiogroup" aria-labelledby={labelId}>
       <div className={cn('mb-2 flex items-center justify-between gap-2', hideLabel && 'sr-only')}>
         <p id={labelId} className="text-[0.9375rem] font-medium">
-          {label}
+          {copy(label)}
         </p>
         {detected ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
             <ScanSearch className="size-3" aria-hidden="true" />
-            Detectado: {detected}
+            {copy('Detectado:')} {detected}
           </span>
         ) : null}
       </div>
-      <div className="grid auto-cols-fr grid-flow-col gap-1 rounded-2xl bg-muted p-1">
+      <div className={cn('grid auto-cols-fr grid-flow-col gap-1 rounded-2xl p-1', isV3 ? 'bg-card ring-1 ring-border' : 'bg-muted')}>
         {options.map((option) => (
           <label
             key={option.value}
-            className="relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 text-sm font-medium text-muted-foreground transition-all has-checked:bg-card has-checked:font-semibold has-checked:text-foreground has-checked:shadow-sm has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+            className={cn('relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 text-sm font-medium transition-all has-checked:font-semibold has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'text-foreground has-checked:bg-primary has-checked:text-primary-foreground' : 'text-muted-foreground has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm')}
           >
             <input
               type="radio"
@@ -514,7 +524,7 @@ function Segmented<V extends string>({
               onChange={() => onChange(option.value)}
               className="sr-only"
             />
-            {option.label}
+            {copy(option.label)}
           </label>
         ))}
       </div>
@@ -533,12 +543,15 @@ function ChoiceList<V extends string>({
   value: V
   onChange: (value: V) => void
 }) {
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   return (
     <div className="flex flex-col gap-2">
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-checked:bg-primary/[0.04] has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+          className={cn('relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'has-checked:bg-primary/10' : 'has-checked:bg-primary/[0.04]')}
         >
           <input
             type="radio"
@@ -555,8 +568,8 @@ function ChoiceList<V extends string>({
             <Check className="size-3.5 text-primary-foreground" strokeWidth={3} />
           </span>
           <span className="flex flex-col">
-            <span className="text-[0.9375rem] font-medium">{option.label}</span>
-            {option.hint ? <span className="text-sm text-muted-foreground">{option.hint}</span> : null}
+            <span className="text-[0.9375rem] font-medium">{copy(option.label)}</span>
+            {option.hint ? <span className="text-sm text-muted-foreground">{copy(option.hint)}</span> : null}
           </span>
         </label>
       ))}

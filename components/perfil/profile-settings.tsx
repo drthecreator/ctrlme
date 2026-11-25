@@ -22,6 +22,7 @@ import { fieldClass } from '@/components/onboarding/onboarding-flow'
 import { initials } from '@/lib/circle'
 import { defaultAlertPrefs, useIdentity, type AlertPrefs } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototype, usePrototypeCopy } from '@/lib/prototype-context'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -29,6 +30,9 @@ export function ProfileSettings() {
   const id = useId()
   const router = useRouter()
   const { state, update, reset } = useIdentity()
+  const prototype = usePrototype()
+  const copy = usePrototypeCopy()
+  const isV3 = prototype.version === 'v3'
   const { identity } = state
   const [adding, setAdding] = useState(false)
   const [newEmail, setNewEmail] = useState('')
@@ -65,7 +69,7 @@ export function ProfileSettings() {
         </span>
         <div className="min-w-0">
           <h2 id={`${id}-identity`} className="text-lg font-semibold">
-            {identity.name || 'Sin nombre'}
+            {identity.name || copy('Sin nombre')}
           </h2>
           <p className="truncate text-sm text-muted-foreground">{identity.emails[0]?.address}</p>
         </div>
@@ -79,13 +83,51 @@ export function ProfileSettings() {
           <Users className="size-5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[0.9375rem] font-semibold">Mi círculo</span>
+          <span className="block text-[0.9375rem] font-semibold">{copy('Mi círculo')}</span>
           <span className="block text-sm text-muted-foreground">
-            Gestiona la identidad de otras personas con su permiso, y decide quién ve la tuya.
+            {copy('Gestiona la identidad de otras personas con su permiso, y decide quién ve la tuya.')}
           </span>
         </span>
         <ChevronRight className="size-5 text-muted-foreground" aria-hidden="true" />
       </Link>
+
+      {isV3 ? (
+        <Group title={prototype.language === 'en' ? 'Accessibility' : 'Accesibilidad'} hint={prototype.language === 'en' ? 'Your preferences are saved on this device.' : 'Tus preferencias se guardan en este dispositivo.'}>
+          <div className="flex flex-col gap-4 p-4">
+  <div className="flex flex-col gap-2">
+  <label htmlFor="prototype-language" className="text-sm font-semibold">Idioma / Language</label>
+  <select id="prototype-language" value={prototype.language} onChange={(event) => prototype.setLanguage(event.target.value as 'es' | 'en')} className="min-h-11 rounded-xl border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring">
+  <option value="es">Español</option>
+  <option value="en">English</option>
+  </select>
+  </div>
+            <fieldset>
+              <legend className="text-sm font-semibold">{prototype.language === 'en' ? 'Appearance' : 'Apariencia'}</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {(['light', 'dark'] as const).map((theme) => (
+                  <button key={theme} type="button" aria-pressed={prototype.theme === theme} onClick={() => prototype.setTheme(theme)} className={cn('min-h-11 rounded-xl border px-3 text-sm font-semibold', prototype.theme === theme ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
+                    {theme === 'light' ? (prototype.language === 'en' ? 'Light' : 'Claro') : (prototype.language === 'en' ? 'Dark' : 'Oscuro')}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend className="text-sm font-semibold">{prototype.language === 'en' ? 'Text size' : 'Tamaño del texto'}</legend>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {([100, 125, 150] as const).map((scale) => (
+                  <button key={scale} type="button" aria-pressed={prototype.fontScale === scale} onClick={() => prototype.setFontScale(scale)} className={cn('min-h-11 rounded-xl border px-2 text-sm font-semibold', prototype.fontScale === scale ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
+                    {`${scale}%`}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <label className="flex min-h-12 items-center justify-between gap-3 text-sm font-semibold">
+              {prototype.language === 'en' ? 'High contrast' : 'Alto contraste'}
+              <Switch checked={prototype.contrast === 'high'} onCheckedChange={(checked) => prototype.setContrast(checked ? 'high' : 'normal')} aria-label={prototype.language === 'en' ? 'Enable high contrast' : 'Activar alto contraste'} />
+            </label>
+          </div>
+        </Group>
+      ) : null}
 
       <Group title="Datos vigilados" hint="Los buscamos en filtraciones y fuentes públicas.">
         {identity.emails.map((email) => (
@@ -96,7 +138,7 @@ export function ProfileSettings() {
             subtitle={email.verified ? 'Verificado · Vigilancia activa' : 'Revisa tu bandeja para verificarlo'}
             aside={
               email.verified ? (
-                <BadgeCheck className="size-5 text-success" aria-label="Verificado" />
+                <BadgeCheck className="size-5 text-success" aria-label={copy('Verificado')} />
               ) : (
                 <Button
                   size="touch-sm"
@@ -111,7 +153,7 @@ export function ProfileSettings() {
                     }))
                   }
                 >
-                  Verificar
+                  {copy('Verificar')}
                 </Button>
               )
             }
@@ -120,7 +162,7 @@ export function ProfileSettings() {
         {adding ? (
           <div className="p-4">
             <label htmlFor={`${id}-new`} className="text-sm font-semibold">
-              Nuevo correo
+              {copy('Nuevo correo')}
             </label>
             <input
               id={`${id}-new`}
@@ -141,15 +183,15 @@ export function ProfileSettings() {
             />
             {error ? (
               <p id={`${id}-new-error`} className="mt-2 text-sm font-medium text-destructive">
-                {error}
+                {copy(error)}
               </p>
             ) : null}
             <div className="mt-3 grid grid-cols-2 gap-2">
               <Button variant="ghost" size="touch-sm" onClick={() => setAdding(false)}>
-                Cancelar
+                {copy('Cancelar')}
               </Button>
               <Button size="touch-sm" onClick={addEmail}>
-                Añadir
+                {copy('Añadir')}
               </Button>
             </div>
           </div>
@@ -162,10 +204,10 @@ export function ProfileSettings() {
             <span className="flex size-10 items-center justify-center rounded-xl border border-dashed border-primary/40">
               <Plus className="size-4" aria-hidden="true" />
             </span>
-            Añadir otro correo
+            {copy('Añadir otro correo')}
           </button>
         )}
-        <Row icon={Phone} title={identity.phone || 'Teléfono'} subtitle={identity.phone ? 'Vigilancia activa' : 'No añadido'} />
+        <Row icon={Phone} title={identity.phone || copy('Teléfono')} subtitle={identity.phone ? 'Vigilancia activa' : 'No añadido'} />
         <Row
           icon={AtSign}
           title={identity.instagram ? `@${identity.instagram}` : 'Instagram'}
@@ -184,7 +226,7 @@ export function ProfileSettings() {
               onCheckedChange={(checked) =>
                 update((s) => ({ ...s, identity: { ...s.identity, googleConnected: checked } }))
               }
-              aria-label="Cuenta de Google conectada"
+              aria-label={copy('Cuenta de Google conectada')}
             />
           }
         />
@@ -199,7 +241,7 @@ export function ProfileSettings() {
             <Switch
               checked={mine.breaches}
               onCheckedChange={(checked) => setPref('me', { breaches: checked })}
-              aria-label="Notificaciones de filtraciones"
+              aria-label={copy('Notificaciones de filtraciones')}
             />
           }
         />
@@ -211,7 +253,7 @@ export function ProfileSettings() {
             <Switch
               checked={mine.summary}
               onCheckedChange={(checked) => setPref('me', { summary: checked })}
-              aria-label="Análisis semanal"
+              aria-label={copy('Análisis semanal')}
             />
           }
         />
@@ -225,7 +267,7 @@ export function ProfileSettings() {
           <p className="p-4 text-sm leading-relaxed text-muted-foreground">
             Nadie recibe tus avisos. Puedes dar permiso a alguien de confianza desde{' '}
             <Link href="/circulo" className="font-semibold text-primary underline-offset-4 hover:underline">
-              Mi círculo
+              {copy('Mi círculo')}
             </Link>
             .
           </p>
@@ -267,31 +309,33 @@ export function ProfileSettings() {
 
       <section aria-labelledby={`${id}-privacy`} className="rounded-3xl border border-destructive/20 p-4">
         <h2 id={`${id}-privacy`} className="font-semibold">
-          Tus datos en Ctrl+Me
+          {copy('Tus datos en Ctrl+Me')}
         </h2>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-          Guardamos solo los datos que ves aquí, cifrados. Puedes borrarlos cuando quieras.
+          {copy('Guardamos solo los datos que ves aquí, cifrados. Puedes borrarlos cuando quieras.')}
         </p>
         {confirmDelete ? (
-          <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label="Confirmar eliminación">
-            <Button variant="ghost" size="touch-sm" onClick={() => setConfirmDelete(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              size="touch-sm"
-              onClick={() => {
-                reset()
-                router.push('/')
-              }}
-            >
-              Sí, borrar todo
-            </Button>
-          </div>
+          isV3 ? (
+            <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4">
+              <section role="alertdialog" aria-modal="true" aria-labelledby={`${id}-delete-title`} aria-describedby={`${id}-delete-description`} className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+                <h2 id={`${id}-delete-title`} className="text-xl font-semibold">{copy('Borrar todos tus datos')}</h2>
+                <p id={`${id}-delete-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">{copy('Esta acción no se puede deshacer. Se eliminarán tu perfil, preferencias y acciones guardadas.')}</p>
+                <div className="mt-6 flex justify-end gap-2">
+                  <Button variant="outline" size="touch-sm" autoFocus onClick={() => setConfirmDelete(false)}>{copy('Cancelar')}</Button>
+<Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>{copy('Sí, borrar todo')}</Button>
+                </div>
+              </section>
+            </div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label="Confirmar eliminación">
+              <Button variant="ghost" size="touch-sm" onClick={() => setConfirmDelete(false)}>{copy('Cancelar')}</Button>
+              <Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>{copy('Sí, borrar todo')}</Button>
+            </div>
+          )
         ) : (
           <Button variant="destructive" size="touch-sm" className="mt-3 w-full" onClick={() => setConfirmDelete(true)}>
             <Trash2 aria-hidden="true" />
-            Borrar mis datos y cuenta
+            {copy('Borrar mis datos y cuenta')}
           </Button>
         )}
       </section>
@@ -301,12 +345,13 @@ export function ProfileSettings() {
 
 function Group({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   const id = useId()
+  const copy = usePrototypeCopy()
   return (
     <section aria-labelledby={id}>
       <h2 id={id} className="px-1 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-        {title}
+        {copy(title)}
       </h2>
-      {hint ? <p className="mt-0.5 px-1 text-sm text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className="mt-0.5 px-1 text-sm text-muted-foreground">{copy(hint)}</p> : null}
       <div className="surface mt-2 divide-y divide-border/70 overflow-hidden rounded-3xl">{children}</div>
     </section>
   )
@@ -323,14 +368,15 @@ function Row({
   subtitle: string
   aside?: React.ReactNode
 }) {
+  const copy = usePrototypeCopy()
   return (
     <div className="flex min-h-16 items-center gap-3 px-4 py-3">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary">
         <Icon className="size-[1.125rem]" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[0.9375rem] font-medium">{title}</p>
-        <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
+        <p className="truncate text-[0.9375rem] font-medium">{copy(title)}</p>
+        <p className="truncate text-sm text-muted-foreground">{copy(subtitle)}</p>
       </div>
       {aside}
     </div>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useIsV3, usePrototypeCopy } from '@/lib/prototype-context'
 import { ArrowRight, Briefcase, MapPin, Share2, UserRound, type LucideIcon } from 'lucide-react'
 import { BottomSheet } from '@/components/bottom-sheet'
 import { buttonVariants } from '@/components/ui/button'
@@ -113,6 +114,8 @@ function buildCategories(email: string): Category[] {
 
 export function CategoryGrid() {
   const { state } = useIdentity()
+  const isV3 = useIsV3()
+  const copy = usePrototypeCopy()
   const [openId, setOpenId] = useState<string | null>(null)
   const categories = buildCategories(state.identity.emails[0]?.address ?? 'tu correo')
   const current = categories.find((category) => category.id === openId) ?? null
@@ -128,29 +131,30 @@ export function CategoryGrid() {
               </span>
               <ExposureBadge exposure={category.exposure} />
             </span>
-            <h2 className="mt-4 text-[0.9375rem] leading-snug font-semibold text-balance">{category.title}</h2>
-            <p className="mt-1 flex-1 text-sm leading-snug text-pretty text-muted-foreground">{category.description}</p>
+            <h2 className="mt-4 text-[0.9375rem] leading-snug font-semibold text-balance">{copy(category.title)}</h2>
+            <p className="mt-1 flex-1 text-sm leading-snug text-pretty text-muted-foreground">{copy(category.description)}</p>
             <button
               type="button"
               onClick={() => setOpenId(category.id)}
               aria-haspopup="dialog"
               className={cn(buttonVariants({ variant: 'secondary', size: 'touch-sm' }), 'mt-4 w-full')}
             >
-              Ver detalles
-              <span className="sr-only"> de {category.title.toLowerCase()}</span>
+              {copy('Ver detalles')}
+              <span className="sr-only"> {copy('de')} {copy(category.title.toLowerCase())}</span>
             </button>
           </li>
         ))}
       </ul>
 
-      <BottomSheet open={current !== null} onClose={() => setOpenId(null)} title={current?.title ?? ''}>
-        {current ? <CategoryDetail category={current} /> : null}
+      <BottomSheet open={current !== null} onClose={() => setOpenId(null)} title={current ? copy(current.title) : ''}>
+        {current ? <CategoryDetail category={current} isV3={isV3} /> : null}
       </BottomSheet>
     </>
   )
 }
 
 function ExposureBadge({ exposure }: { exposure: { label: string; tone: Tone } }) {
+  const copy = usePrototypeCopy()
   return (
     <span
       className={cn(
@@ -159,28 +163,29 @@ function ExposureBadge({ exposure }: { exposure: { label: string; tone: Tone } }
       )}
     >
       <span className={cn('size-1.5 rounded-full', toneStyles[exposure.tone].dot)} aria-hidden="true" />
-      <span className="sr-only">Nivel de exposición: </span>
-      {exposure.label}
+      <span className="sr-only">{copy('Nivel de exposición:')} </span>
+      {copy(exposure.label)}
     </span>
   )
 }
 
-function CategoryDetail({ category }: { category: Category }) {
+function CategoryDetail({ category, isV3 }: { category: Category; isV3: boolean }) {
+  const copy = usePrototypeCopy()
   return (
     <div>
       <div className="flex items-center gap-4 rounded-3xl bg-card p-4 shadow-xs ring-1 ring-border">
         <p className="font-serif text-[3rem] leading-none tabular-nums">{category.stat.value}</p>
         <div className="min-w-0 flex-1">
-          <p className="text-sm leading-snug font-medium text-pretty">{category.stat.label}</p>
+          <p className="text-sm leading-snug font-medium text-pretty">{copy(category.stat.label)}</p>
           <div className="mt-1.5">
             <ExposureBadge exposure={category.exposure} />
           </div>
         </div>
       </div>
 
-      <p className="mt-4 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{category.summary}</p>
+      <p className="mt-4 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{copy(category.summary)}</p>
 
-      <h3 className="mt-6 mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">Lo que encontramos</h3>
+      <h3 className="mt-6 mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">{copy('Lo que encontramos')}</h3>
       <ul className="overflow-hidden rounded-3xl bg-card ring-1 ring-border">
         {category.findings.map((finding) => (
           <li key={finding.title} className="flex gap-3 border-b border-border/70 p-4 last:border-b-0">
@@ -189,30 +194,30 @@ function CategoryDetail({ category }: { category: Category }) {
               aria-hidden="true"
             />
             <span>
-              <span className="block text-[0.9375rem] font-semibold">{finding.title}</span>
-              <span className="block text-sm leading-snug text-pretty text-muted-foreground">{finding.text}</span>
+              <span className="block text-[0.9375rem] font-semibold">{copy(finding.title)}</span>
+              <span className="block text-sm leading-snug text-pretty text-muted-foreground">{copy(finding.text)}</span>
             </span>
           </li>
         ))}
       </ul>
 
-      <h3 className="mt-6 mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">Qué puedes hacer</h3>
+      <h3 className="mt-6 mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">{copy('Qué puedes hacer')}</h3>
       <ol className="flex flex-col gap-2">
         {category.advice.map((tip, index) => (
-          <li key={tip} className="flex gap-3 rounded-2xl bg-secondary/60 p-3.5 text-[0.9375rem] leading-snug">
+          <li key={tip} className={cn('flex gap-3 rounded-2xl p-3.5 text-[0.9375rem] leading-snug', isV3 ? 'bg-background ring-1 ring-border' : 'bg-secondary/60')}>
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
               aria-hidden="true"
             >
               {index + 1}
             </span>
-            <span className="text-pretty">{tip}</span>
+            <span className="text-pretty">{copy(tip)}</span>
           </li>
         ))}
       </ol>
 
       <Link href={category.action.href} className={cn(buttonVariants({ size: 'touch' }), 'mt-6 w-full')}>
-        {category.action.label}
+        {copy(category.action.label)}
         <ArrowRight aria-hidden="true" />
       </Link>
     </div>

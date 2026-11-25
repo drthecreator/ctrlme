@@ -16,6 +16,7 @@ import {
   type IdentityState,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { localize, usePrototypeCopy, usePrototype } from '@/lib/prototype-context'
 
 type Reply = { text: string; actions?: ChatMessage['actions'] }
 type VoicePhase = 'idle' | 'listening' | 'thinking' | 'speaking'
@@ -40,7 +41,54 @@ const normalize = (text: string) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
 
-function buildReply(input: string, state: IdentityState): Reply {
+function buildEnglishReply(input: string, state: IdentityState): Reply {
+  const text = normalize(input)
+  const { total } = computeScore(state)
+  const plan = getPlan(state)
+  const suspicious = getSuspiciousSessions(state).length
+  const pending = getPendingAccounts(state).length
+
+  if (/session|device|unknown|unrecognized/.test(text)) {
+    return suspicious > 0
+      ? { text: `You have ${suspicious} suspicious session${suspicious === 1 ? '' : 's'} open. I recommend closing ${suspicious === 1 ? 'it' : 'them'} now and changing the password if you do not recognize ${suspicious === 1 ? 'it' : 'them'}.`, actions: [{ label: 'Review sessions', href: '/asistente/sesiones' }] }
+      : { text: 'I do not see any suspicious sessions open right now. I will keep monitoring them.' }
+  }
+  if (/breach|hack|stolen|compromised|alert/.test(text)) {
+    return hasOpenBreach(state)
+      ? { text: 'Your email appears in a breach you have not resolved yet. Follow the steps: change the affected password, turn on two-step verification, and review your sessions.', actions: [{ label: 'View breach', href: '/alertas' }] }
+      : { text: 'You have no unresolved breaches. I will email you if your data appears in a new one.', actions: [{ label: 'View alerts', href: '/alertas' }] }
+  }
+  if (/two.step|2fa|verification/.test(text)) {
+    return { text: 'Two-step verification adds an extra sign-in code, so a stolen password is not enough. Turn it on for your email and bank first; an authenticator app is safer than text messages.', actions: [{ label: 'View guides', href: '/guias' }] }
+  }
+  if (/password|passphrase|manager/.test(text)) {
+    return { text: 'Use a unique, long password for every account. A password manager can remember them for you, so you only need to remember one master password.', actions: [{ label: 'Password guide', href: '/guias' }] }
+  }
+  if (/text|sms|phishing|scam|link|bank|fraud/.test(text)) {
+    return { text: 'Do not tap the link or reply. Banks do not ask for personal information by text. Open the official app to check for a real alert, then report the message to your bank. If you already tapped it, change your password and contact the bank.' }
+  }
+  if (/account|delete|remove|cleanup|old|inactive/.test(text)) {
+    return pending > 0
+      ? { text: `We found ${pending} inactive account${pending === 1 ? '' : 's'} in your name. Each one is another place where your data could be exposed, so it is best to delete them.`, actions: [{ label: 'Go to Cleanup', href: '/limpieza' }] }
+      : { text: 'You have no inactive accounts waiting to be cleaned up. Great job keeping your footprint up to date.' }
+  }
+  if (/\bai\b|artificial intelligence|chatgpt|photo|selfie/.test(text)) {
+    return { text: 'Be cautious. Anything you upload to an AI tool may be stored and used to train models. Avoid uploading photos of yourself, documents, or other people, and do not share health or financial details.' }
+  }
+  if (/wi.?fi|cafe|airport|public network/.test(text)) {
+    return { text: 'On an open Wi-Fi network, other people may be able to spy on what you send. Use mobile data for banking or shopping; if you have no alternative, a VPN can reduce the risk.' }
+  }
+  if (/score|improve|level|plan|footprint/.test(text)) {
+    const top = plan.slice(0, 3)
+    if (!top.length) return { text: `Your score is ${total}/100 and there are no improvements waiting. Keep it up.` }
+    return { text: `Your score is ${total}/100. The actions that would help most right now: ${top.map((item, i) => `${i + 1}) ${localize(item.title, 'en')} (+${item.gain})`).join('; ')}.`, actions: [{ label: 'View full plan', href: '/plan' }, { label: 'Your digital footprint', href: '/huella' }] }
+  }
+  if (/hello|hi|hey|how are you/.test(text)) return { text: `Hello${state.identity.name ? `, ${state.identity.name}` : ''}. How can I help you stay safer online today?` }
+  return { text: 'I am not sure I understood. I can help with passwords, breaches, open sessions, old accounts, text message scams, and ways to improve your score.' }
+}
+
+function buildReply(input: string, state: IdentityState, language: 'es' | 'en' = 'es'): Reply {
+  if (language === 'en') return buildEnglishReply(input, state)
   const text = normalize(input)
   const { total } = computeScore(state)
   const plan = getPlan(state)
@@ -124,7 +172,7 @@ function buildReply(input: string, state: IdentityState): Reply {
   }
 }
 
-function speak(text: string, onDone: () => void): () => void {
+function speak(text: string, onDone: () => void, language: 'es' | 'en' = 'es'): () => void {
   let finished = false
   const finish = () => {
     if (finished) return
@@ -136,7 +184,7 @@ function speak(text: string, onDone: () => void): () => void {
   const synth = 'speechSynthesis' in window ? window.speechSynthesis : null
   if (synth) {
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'es-ES'
+    utterance.lang = language === 'en' ? 'en-US' : 'es-ES'
     utterance.onend = finish
     utterance.onerror = finish
     synth.cancel()
@@ -154,6 +202,9 @@ const nextId = () => `msg-${Date.now()}-${messageCounter++}`
 
 export function ChatAssistant() {
   const { state, update } = useIdentity()
+  const { language, version } = usePrototype()
+  const copy = usePrototypeCopy()
+  const activeLanguage = version === 'v3' ? language : 'es'
   const [draft, setDraft] = useState('')
   const [typing, setTyping] = useState(false)
   const [phase, setPhase] = useState<VoicePhase>('idle')
@@ -212,7 +263,7 @@ export function ChatAssistant() {
     addMessage({ role: 'user', text })
     setTyping(true)
     later(() => {
-      const reply = buildReply(text, stateRef.current)
+      const reply = buildReply(text, stateRef.current, activeLanguage)
       setTyping(false)
       addMessage({ role: 'assistant', ...reply })
     }, 1100)
@@ -222,7 +273,10 @@ export function ChatAssistant() {
     if (busy) return
     stopAll()
     setReadingId(null)
-    const phrase = VOICE_PHRASES[state.chat.filter((m) => m.voice).length % VOICE_PHRASES.length]
+    const voicePhrases = activeLanguage === 'en'
+      ? ['How can I improve my score?', 'Do I have an open session I do not recognize?', 'What should I do if I get a suspicious text from my bank?']
+      : VOICE_PHRASES
+    const phrase = voicePhrases[state.chat.filter((m) => m.voice).length % voicePhrases.length]
     const words = phrase.split(' ')
     setTranscript('')
     setPhase('listening')
@@ -235,14 +289,14 @@ export function ChatAssistant() {
     }, 700 + words.length * 300 + 700)
     later(
       () => {
-        const reply = buildReply(phrase, stateRef.current)
+        const reply = buildReply(phrase, stateRef.current, activeLanguage)
         addMessage({ role: 'assistant', ...reply, voice: true })
         setPhase('speaking')
         cancelSpeech.current = speak(reply.text, () => {
           cancelSpeech.current = null
           setPhase('idle')
           setTranscript('')
-        })
+        }, activeLanguage)
       },
       700 + words.length * 300 + 700 + 1300,
     )
@@ -266,7 +320,7 @@ export function ChatAssistant() {
     cancelSpeech.current = speak(message.text, () => {
       cancelSpeech.current = null
       setReadingId(null)
-    })
+    }, activeLanguage)
   }
 
   const firstName = state.identity.name.trim().split(' ')[0]
@@ -276,7 +330,7 @@ export function ChatAssistant() {
       <header className="flex items-center gap-2 border-b border-border/70 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-3">
         <Link
           href="/"
-          aria-label="Volver al inicio"
+          aria-label={copy('Volver al inicio')}
           className="flex size-11 shrink-0 items-center justify-center rounded-xl text-primary transition-colors hover:bg-muted"
         >
           <ChevronLeft className="size-6" aria-hidden="true" />
@@ -285,10 +339,10 @@ export function ChatAssistant() {
           <Sparkles className="size-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h1 tabIndex={-1} className="font-serif text-[1.5rem] leading-none tracking-tight">Asistente</h1>
+          <h1 tabIndex={-1} className="font-serif text-[1.5rem] leading-none tracking-tight">{copy('Asistente')}</h1>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
-            En línea · Escribe o habla
+            {copy('En línea')} · {copy('Escribe o habla')}
           </p>
         </div>
         <Link
@@ -296,7 +350,7 @@ export function ChatAssistant() {
           className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-sm font-medium transition-colors hover:bg-muted"
         >
           <ListChecks className="size-4 text-primary" aria-hidden="true" />
-          Revisión guiada
+          {copy('Revisión guiada')}
         </Link>
       </header>
 
@@ -304,17 +358,20 @@ export function ChatAssistant() {
         ref={scrollRef}
         role="log"
         aria-live="polite"
-        aria-label="Conversación con el asistente"
+        aria-label={copy('Conversación con el asistente')}
         className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4"
       >
         <p className="mx-auto w-fit rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-          Demo: las respuestas son simuladas
+          {copy('Demo: las respuestas son simuladas')}
         </p>
         <AssistantBubble
           message={{
             id: 'intro',
             role: 'assistant',
-            text: `Hola${firstName ? `, ${firstName}` : ''}. Soy tu asistente de identidad digital. Puedes escribirme o pulsar el micrófono para hablar conmigo, y yo te respondo en voz alta si lo prefieres.`,
+            text: activeLanguage === 'en'
+              ? `Hello${firstName ? `, ${firstName}` : ''}. I am your digital identity assistant. Type to me or tap the microphone to speak, and I can reply out loud if you prefer.`
+              : `Hola${firstName ? `, ${firstName}` : ''}. Soy tu asistente de identidad digital. Puedes escribirme o pulsar el micrófono para hablar conmigo, y yo te respondo en voz alta si lo prefieres.`,
+
           }}
           reading={false}
           onToggleReading={undefined}
@@ -337,16 +394,16 @@ export function ChatAssistant() {
       <div className="border-t border-border/70 bg-card pt-2 pb-3">
         {phase === 'idle' ? (
           <>
-            <ul className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-2" aria-label="Preguntas sugeridas">
+            <ul className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-2" aria-label={copy('Preguntas sugeridas')}>
               {SUGGESTIONS.map((suggestion) => (
                 <li key={suggestion} className="shrink-0">
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => sendText(suggestion)}
+                    onClick={() => sendText(copy(suggestion))}
                     className="min-h-10 rounded-full border border-border bg-background px-3.5 text-sm font-medium whitespace-nowrap transition-colors hover:bg-muted disabled:opacity-50"
                   >
-                    {suggestion}
+                    {copy(suggestion)}
                   </button>
                 </li>
               ))}
@@ -359,13 +416,13 @@ export function ChatAssistant() {
               }}
             >
               <label htmlFor="chat-input" className="sr-only">
-                Escribe tu pregunta
+                {copy('Escribe tu pregunta')}
               </label>
               <input
                 id="chat-input"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Escribe tu pregunta…"
+                placeholder={copy('Escribe tu pregunta…')}
                 autoComplete="off"
                 className="min-h-12 min-w-0 flex-1 rounded-full border border-input bg-background px-4 text-base outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40"
               />
@@ -373,7 +430,7 @@ export function ChatAssistant() {
                 <button
                   type="submit"
                   disabled={busy}
-                  aria-label="Enviar mensaje"
+                  aria-label={copy('Enviar mensaje')}
                   className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-50"
                 >
                   <SendHorizontal className="size-5" aria-hidden="true" />
@@ -383,7 +440,7 @@ export function ChatAssistant() {
                   type="button"
                   onClick={startVoice}
                   disabled={busy}
-                  aria-label="Hablar con el asistente"
+                  aria-label={copy('Hablar con el asistente')}
                   className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-50"
                 >
                   <Mic className="size-5" aria-hidden="true" />
@@ -400,6 +457,7 @@ export function ChatAssistant() {
 }
 
 function UserBubble({ message }: { message: ChatMessage }) {
+  const copy = usePrototypeCopy()
   return (
     <div className="flex flex-col items-end gap-1">
       <p className="max-w-[85%] rounded-3xl rounded-br-lg bg-primary px-4 py-2.5 text-[0.9375rem] leading-relaxed text-primary-foreground">
@@ -408,7 +466,7 @@ function UserBubble({ message }: { message: ChatMessage }) {
       {message.voice ? (
         <span className="flex items-center gap-1 pr-1 text-xs text-muted-foreground">
           <Mic className="size-3" aria-hidden="true" />
-          Mensaje de voz
+          {copy('Mensaje de voz')}
         </span>
       ) : null}
     </div>
@@ -424,6 +482,7 @@ function AssistantBubble({
   reading: boolean
   onToggleReading: (() => void) | undefined
 }) {
+  const copy = usePrototypeCopy()
   return (
     <div className="flex items-start gap-2">
       <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
@@ -431,7 +490,7 @@ function AssistantBubble({
       </span>
       <div className="max-w-[85%] space-y-2">
         <div className="surface rounded-3xl rounded-tl-lg px-4 py-3">
-          <p className="text-[0.9375rem] leading-relaxed text-pretty">{message.text}</p>
+          <p className="text-[0.9375rem] leading-relaxed text-pretty">{copy(message.text)}</p>
           {message.actions?.length ? (
             <div className="mt-3 flex flex-col gap-2">
               {message.actions.map((action) => (
@@ -440,7 +499,7 @@ function AssistantBubble({
                   href={action.href}
                   className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-secondary px-3.5 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/70"
                 >
-                  {action.label}
+                  {copy(action.label)}
                   <ChevronRight className="size-4" aria-hidden="true" />
                 </Link>
               ))}
@@ -454,7 +513,7 @@ function AssistantBubble({
             className="flex min-h-9 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             {reading ? <Square className="size-3.5" aria-hidden="true" /> : <Volume2 className="size-3.5" aria-hidden="true" />}
-            {reading ? 'Detener lectura' : 'Escuchar respuesta'}
+            {copy(reading ? 'Detener lectura' : 'Escuchar respuesta')}
           </button>
         ) : null}
       </div>
@@ -463,13 +522,14 @@ function AssistantBubble({
 }
 
 function TypingBubble() {
+  const copy = usePrototypeCopy()
   return (
     <div className="flex items-start gap-2" role="status">
       <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
         <Sparkles className="size-4" aria-hidden="true" />
       </span>
       <div className="surface flex items-center gap-1.5 rounded-3xl rounded-tl-lg px-4 py-4">
-        <span className="sr-only">El asistente está escribiendo</span>
+        <span className="sr-only">{copy('El asistente está escribiendo')}</span>
         {[0, 1, 2].map((i) => (
           <span
             key={i}

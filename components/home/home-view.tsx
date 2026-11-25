@@ -20,9 +20,12 @@ import {
   type IdentityState,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { localize, t, usePrototype } from '@/lib/prototype-context'
 
 export function HomeView() {
   const { state } = useIdentity()
+  const prototype = usePrototype()
+  const isV3 = prototype.version === 'v3'
 
   if (!state.onboarded) return <OnboardingFlow />
 
@@ -32,17 +35,21 @@ export function HomeView() {
   const pendingAccounts = getPendingAccounts(state).length
   const breachOpen = hasOpenBreach(state)
   const primaryEmail = state.identity.emails[0]?.address
+  const protectionLabel = isV3 ? t(({ destructive: 'Protección escasa', warning: 'Protección media', success: 'Protección excelente' } as const)[getLevel(total).tone], prototype.language) : getLevel(total).label
+  const scoreLinkLabel = prototype.language === 'en'
+    ? `Your score is ${total} out of 100, ${protectionLabel.toLowerCase()}. View your digital footprint`
+    : `Tu puntuación es ${total} de 100, ${protectionLabel.toLowerCase()}. Ver tu huella digital`
 
   return (
     <Screen wide>
       <HomeHeader name={state.identity.name} email={state.identity.emails[0]?.address} />
-      <h1 tabIndex={-1} className="px-5 pt-3 pb-2 text-lg font-semibold tracking-tight lg:hidden">Tu resumen</h1>
-      <div className="hidden px-5 pt-2 pb-5 lg:block">
-        <h1 tabIndex={-1} className="font-serif text-[2.75rem] leading-tight tracking-tight">
-          Tu resumen
-        </h1>
-        <p className="mt-1 text-base text-muted-foreground">Así está hoy tu identidad digital.</p>
-      </div>
+      {!isV3 ? <>
+        <h1 tabIndex={-1} className="px-5 pt-3 pb-2 text-lg font-semibold tracking-tight lg:hidden">Tu resumen</h1>
+        <div className="hidden px-5 pt-2 pb-5 lg:block">
+          <h1 tabIndex={-1} className="font-serif text-[2.75rem] leading-tight tracking-tight">Tu resumen</h1>
+          <p className="mt-1 text-base text-muted-foreground">Así está hoy tu identidad digital.</p>
+        </div>
+      </> : <h1 tabIndex={-1} className="sr-only">{t('Tu identidad digital', prototype.language)}</h1>}
 
       <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-6">
       <div className="lg:col-span-7">
@@ -52,35 +59,61 @@ export function HomeView() {
           <span className="relative inline-flex size-2 rounded-full bg-success" />
         </span>
         <span className="min-w-0 truncate">
-          Vigilando <strong className="font-semibold">{primaryEmail}</strong>
-          {state.identity.emails.length > 1 ? ` y ${state.identity.emails.length - 1} más` : ''}
+              {isV3 ? t('Vigilando', prototype.language) : 'Vigilando'} <strong className="font-semibold">{primaryEmail}</strong>
+              {state.identity.emails.length > 1 ? isV3 && prototype.language === 'en' ? ` and ${state.identity.emails.length - 1} more` : ` y ${state.identity.emails.length - 1} más` : ''}
         </span>
         <span className="ml-auto shrink-0 text-muted-foreground">{formatRelative(state.scannedAt, Date.now())}</span>
       </p>
 
       <section aria-labelledby="score-title" className="px-5 pt-5">
         <h2 id="score-title" className="sr-only">
-          Tu puntuación
+          {isV3 ? t('Tu puntuación', prototype.language) : 'Tu puntuación'}
         </h2>
-        <Link
-          href="/huella"
-          aria-label={`Tu puntuación es ${total} de 100, ${getLevel(total).label.toLowerCase()}. Ver tu huella digital`}
-          className="surface flex flex-col gap-3 rounded-3xl px-4 pt-5 pb-4 transition-transform active:scale-[0.99]"
-        >
-          <div className="mx-auto w-full lg:max-w-md">
-            <ScoreArc score={total} cta="Ver mi huella digital" />
+        {isV3 ? (
+          <div className="surface flex flex-col gap-3 rounded-3xl px-4 pt-5 pb-4">
+            <Link
+              href="/huella"
+              aria-label={scoreLinkLabel}
+              className="rounded-2xl focus-visible:outline-none"
+            >
+              <div className="mx-auto w-full lg:max-w-md">
+                <ScoreArc score={total} />
+              </div>
+            </Link>
+            <ScoreLegend />
+            <p className="text-center text-xs text-muted-foreground">
+              {t('Cuanto más alta sea la puntuación, mejor protegida está tu identidad.', prototype.language)}
+            </p>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <Link href="/huella" className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'min-w-0 px-2 text-center text-xs sm:text-sm')}>
+                {isV3 ? t('Ver mi huella digital', prototype.language) : 'Ver mi huella digital'}
+              </Link>
+              <Link href="/plan" className={cn(buttonVariants({ variant: 'default', size: 'touch-sm' }), 'min-w-0 px-2 text-center text-xs sm:text-sm')}>
+                {isV3 ? t('Mejora tu puntuación', prototype.language) : 'Mejora tu puntuación'}
+              </Link>
+            </div>
           </div>
-          <ScoreLegend />
-          <p className="text-center text-xs text-muted-foreground">
-            Cuanto más alta sea la puntuación, mejor protegida está tu identidad.
-          </p>
-        </Link>
+        ) : (
+          <Link
+            href="/huella"
+            aria-label={scoreLinkLabel}
+            className="surface flex flex-col gap-3 rounded-3xl px-4 pt-5 pb-4 transition-transform active:scale-[0.99]"
+          >
+            <div className="mx-auto w-full lg:max-w-md">
+              <ScoreArc score={total} cta="Ver mi huella digital" />
+            </div>
+            <ScoreLegend />
+            <p className="text-center text-xs text-muted-foreground">
+              Cuanto más alta sea la puntuación, mejor protegida está tu identidad.
+            </p>
+          </Link>
+        )}
         <div className="mt-3 flex justify-center">
           <Link
             href="/evaluacion"
             className="inline-flex min-h-12 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-primary transition-colors hover:bg-muted"
           >
-            {state.assessmentDone ? 'Ver cómo se calcula' : 'Afinar con la evaluación (4 min)'}
+            {isV3 ? state.assessmentDone ? t('Ver cómo se calcula', prototype.language) : t('Afinar con la evaluación (4 min)', prototype.language) : state.assessmentDone ? 'Ver cómo se calcula' : 'Afinar con la evaluación (4 min)'}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
@@ -101,8 +134,8 @@ export function HomeView() {
             <Sparkles className="size-5" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[0.9375rem] font-semibold">Habla con el asistente</span>
-            <span className="block text-sm text-muted-foreground">Escribe o usa tu voz para resolver dudas</span>
+            <span className="block text-[0.9375rem] font-semibold">{isV3 ? t('Habla con el asistente', prototype.language) : 'Habla con el asistente'}</span>
+            <span className="block text-sm text-muted-foreground">{isV3 ? t('Escribe o usa tu voz para resolver dudas', prototype.language) : 'Escribe o usa tu voz para resolver dudas'}</span>
           </span>
           <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
         </Link>
@@ -110,41 +143,45 @@ export function HomeView() {
 
       <CircleCard />
 
-      <section aria-label="Resumen" className="grid grid-cols-2 gap-3 px-5 pt-3">
-        <SummaryCard
-          href="/limpieza?tab=inactivas"
-          title="Limpiar cuentas"
-          prefix={pendingAccounts > 0 ? 'Tienes' : undefined}
-          value={pendingAccounts}
-          caption={pendingAccounts === 1 ? 'cuenta inactiva' : 'cuentas inactivas'}
-        />
-        <SummaryCard
-          href="/alertas"
-          title="Alertas de filtraciones"
-          value={breachOpen ? 1 : 0}
-          caption={breachOpen ? 'filtración detectada' : 'filtraciones activas'}
-          urgent={breachOpen}
-        />
-      </section>
+      {!isV3 ? (
+        <>
+          <section aria-label="Resumen" className="grid grid-cols-2 gap-3 px-5 pt-3">
+            <SummaryCard
+              href="/limpieza?tab=inactivas"
+              title="Limpiar cuentas"
+              prefix={pendingAccounts > 0 ? 'Tienes' : undefined}
+              value={pendingAccounts}
+              caption={pendingAccounts === 1 ? 'cuenta inactiva' : 'cuentas inactivas'}
+            />
+            <SummaryCard
+              href="/alertas"
+              title="Alertas de filtraciones"
+              value={breachOpen ? 1 : 0}
+              caption={breachOpen ? 'filtración detectada' : 'filtraciones activas'}
+              urgent={breachOpen}
+            />
+          </section>
 
-      {plan.length > 0 ? (
-        <div className="px-5 pt-3">
-          <Link
-            href="/plan"
-            className="surface flex min-h-16 items-center gap-3 rounded-3xl p-4 transition-transform active:scale-[0.99]"
-          >
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-success-soft text-success">
-              <TrendingUp className="size-5" aria-hidden="true" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[0.9375rem] font-semibold">Tu plan para subir</span>
-              <span className="block text-sm text-muted-foreground">
-                {plan.length} acciones · hasta +{potential} puntos
-              </span>
-            </span>
-            <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
-          </Link>
-        </div>
+          {plan.length > 0 ? (
+            <div className="px-5 pt-3">
+              <Link
+                href="/plan"
+                className="surface flex min-h-16 items-center gap-3 rounded-3xl p-4 transition-transform active:scale-[0.99]"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-success-soft text-success">
+                  <TrendingUp className="size-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.9375rem] font-semibold">Tu plan para subir</span>
+                  <span className="block text-sm text-muted-foreground">
+                    {plan.length} acciones · hasta +{potential} puntos
+                  </span>
+                </span>
+                <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
+              </Link>
+            </div>
+          ) : null}
+        </>
       ) : null}
       </div>
       </div>
@@ -154,8 +191,14 @@ export function HomeView() {
 
 function CircleCard() {
   const { state } = useIdentity()
+  const prototype = usePrototype()
+  const isV3 = prototype.version === 'v3'
   const active = state.circle.members.filter((m) => m.status === 'activo').length
   const requests = state.circle.incoming.length
+  const circleName = isV3 ? t('Mi círculo', prototype.language) : 'Mi círculo'
+  const circleDescription = active > 0
+    ? `${isV3 ? prototype.language === 'en' ? 'You care for the identity of' : 'Cuidas la identidad de' : 'Cuidas la identidad de'} ${active} ${isV3 ? t(active === 1 ? 'persona' : 'personas', prototype.language) : active === 1 ? 'persona' : 'personas'}`
+    : isV3 ? t('Ayuda a quien te lo pida', prototype.language) : 'Ayuda a quien te lo pida'
 
   return (
     <div className="px-5 pt-3">
@@ -167,15 +210,13 @@ function CircleCard() {
           <Users className="size-5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[0.9375rem] font-semibold">Mi círculo</span>
-          <span className="block text-sm text-muted-foreground">
-            {active > 0 ? `Cuidas la identidad de ${active} ${active === 1 ? 'persona' : 'personas'}` : 'Ayuda a quien te lo pida'}
-          </span>
+          <span className="block text-[0.9375rem] font-semibold">{circleName}</span>
+          <span className="block text-sm text-muted-foreground">{circleDescription}</span>
         </span>
         {requests > 0 ? (
           <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-bold text-white">
             {requests}
-            <span className="sr-only"> {requests === 1 ? 'solicitud nueva' : 'solicitudes nuevas'}</span>
+            <span className="sr-only"> {isV3 ? t(requests === 1 ? 'solicitud nueva' : 'solicitudes nuevas', prototype.language) : requests === 1 ? 'solicitud nueva' : 'solicitudes nuevas'}</span>
           </span>
         ) : (
           <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
@@ -186,6 +227,8 @@ function CircleCard() {
 }
 
 function ActionCard({ state }: { state: IdentityState }) {
+  const prototype = usePrototype()
+  const isV3 = prototype.version === 'v3'
   const suspicious = getSuspiciousSessions(state)
   const plan = getPlan(state)
 
@@ -239,14 +282,24 @@ function ActionCard({ state }: { state: IdentityState }) {
       />
       <p className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-accent uppercase">
         <Icon className="size-3.5" aria-hidden="true" />
-        {content.eyebrow}
+        {isV3 ? t(content.eyebrow as 'Acción recomendada' | 'Siguiente paso' | 'Todo en orden', prototype.language) : content.eyebrow}
       </p>
       <h2 id="accion-title" className="mt-2 font-serif text-[1.75rem] leading-tight text-balance">
-        {content.title}
+        {isV3 && suspicious.length > 0
+          ? `${suspicious.length} ${t(suspicious.length === 1 ? 'sesión sospechosa' : 'sesiones sospechosas', prototype.language)}`
+          : isV3 && hasOpenBreach(state) ? `${t('Filtración en', prototype.language)} ${BREACH.service}`
+            : isV3 && !plan.length ? t('Tu identidad está protegida', prototype.language) : isV3 ? localize(content.title, prototype.language) : content.title}
       </h2>
-      <p className="mt-1 text-[0.9375rem] leading-relaxed text-primary-foreground/75">{content.body}</p>
+      <p className="mt-1 text-[0.9375rem] leading-relaxed text-primary-foreground/75">
+        {isV3 && suspicious.length > 0 ? t('Dispositivos que no reconocemos siguen conectados a tu cuenta de Google.', prototype.language)
+          : isV3 && hasOpenBreach(state) ? t('Tu contraseña antigua aparece en una base de datos filtrada.', prototype.language)
+            : isV3 && !plan.length ? t('Seguiremos vigilando y te avisaremos si detectamos algo nuevo.', prototype.language) : isV3 ? localize(content.body, prototype.language) : content.body}
+      </p>
       <Link href={content.href} className={cn(buttonVariants({ variant: 'accent', size: 'touch' }), 'mt-4 w-full')}>
-        {content.cta}
+        {isV3 && suspicious.length > 0 ? t('Resolver con asistente', prototype.language)
+          : isV3 && hasOpenBreach(state) ? t('Ver qué hacer', prototype.language)
+            : isV3 && !plan.length ? t('Ver tu huella digital', prototype.language)
+              : isV3 ? localize(content.cta, prototype.language) : content.cta}
         <ArrowRight aria-hidden="true" />
       </Link>
     </div>

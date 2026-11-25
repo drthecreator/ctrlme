@@ -20,6 +20,11 @@ import { Button } from '@/components/ui/button'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { Switch } from '@/components/ui/switch'
 import { useIdentity, type Identity } from '@/lib/identity-store'
+import { useIsV3, usePrototype } from '@/lib/prototype-context'
+
+function copyText(es: string, en: string, isV3: boolean, language: 'es' | 'en') {
+  return isV3 && language === 'en' ? en : es
+}
 import { cn } from '@/lib/utils'
 
 type Step = 'welcome' | 'email' | 'code' | 'connect' | 'scan'
@@ -115,10 +120,12 @@ export function OnboardingFlow() {
 }
 
 function Welcome({ onStart }: { onStart: () => void }) {
+  const language = usePrototype().language
+  const isV3 = useIsV3()
   const features = [
-    { icon: Bell, title: 'Alertas de filtraciones', text: 'Te avisamos si tu correo aparece en una brecha.' },
-    { icon: Brush, title: 'Limpieza digital', text: 'Cierra sesiones y borra cuentas olvidadas.' },
-    { icon: BookOpen, title: 'Aprende en 1 minuto', text: 'Guías visuales para protegerte.' },
+    { icon: Bell, title: copyText('Alertas de filtraciones', 'Breach alerts', isV3, language), text: copyText('Te avisamos si tu correo aparece en una brecha.', 'We alert you if your email appears in a data breach.', isV3, language) },
+    { icon: Brush, title: copyText('Limpieza digital', 'Digital cleanup', isV3, language), text: copyText('Cierra sesiones y borra cuentas olvidadas.', 'Close sessions and remove forgotten accounts.', isV3, language) },
+    { icon: BookOpen, title: copyText('Aprende en 1 minuto', 'Learn in 1 minute', isV3, language), text: copyText('Guías visuales para protegerte.', 'Visual guides to help keep you safe.', isV3, language) },
   ]
   return (
     <div className="h-full overflow-y-auto">
@@ -135,10 +142,10 @@ function Welcome({ onStart }: { onStart: () => void }) {
           </div>
           <p className="mt-8 text-sm font-semibold tracking-[0.12em] text-muted-foreground uppercase">Ctrl+Me</p>
           <h1 tabIndex={-1} className="mt-2 font-serif text-[2.75rem] leading-[1.02] tracking-tight text-balance lg:text-6xl">
-            Tu identidad digital, bajo control.
+            {copyText('Tu identidad digital, bajo control.', 'Your digital identity, under control.', isV3, language)}
           </h1>
           <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground lg:mt-5 lg:text-lg">
-            Descubre qué sabe internet de ti y arréglalo paso a paso, sin tecnicismos.
+            {copyText('Descubre qué sabe internet de ti y arréglalo paso a paso, sin tecnicismos.', 'Find out what the internet knows about you and take it back step by step, no technical knowledge needed.', isV3, language)}
           </p>
         </div>
 
@@ -158,12 +165,12 @@ function Welcome({ onStart }: { onStart: () => void }) {
 
         <div className="mt-auto pt-10 md:mt-0 md:pt-10 lg:col-start-1 lg:row-start-2 lg:max-w-sm lg:pt-8">
           <Button size="touch" className="w-full" onClick={onStart}>
-            Empezar
+            {copyText('Empezar', 'Get started', isV3, language)}
             <ArrowRight aria-hidden="true" />
           </Button>
           <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <Lock className="size-3.5" aria-hidden="true" />
-            Nunca te pediremos contraseñas ni leeremos tus mensajes.
+            {copyText('Nunca te pediremos contraseñas ni leeremos tus mensajes.', 'We will never ask for your passwords or read your messages.', isV3, language)}
           </p>
         </div>
       </div>
@@ -172,6 +179,8 @@ function Welcome({ onStart }: { onStart: () => void }) {
 }
 
 function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
+  const language = usePrototype().language
+  const isV3 = useIsV3()
   return (
     <div className="sticky top-0 z-10 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-2 md:px-6 md:pt-6">
       <div className="mx-auto flex w-full max-w-lg items-center gap-3 md:max-w-5xl">
@@ -181,11 +190,11 @@ function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
         className="inline-flex min-h-12 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
       >
         <ChevronLeft className="size-5" aria-hidden="true" />
-        Volver
+        {copyText('Volver', 'Back', isV3, language)}
       </button>
       <div className="ml-auto flex items-center gap-2 pr-2">
         <span className="text-sm text-muted-foreground tabular-nums" aria-live="polite" aria-atomic="true">
-          Paso {index} de 3
+          {isV3 && language === 'en' ? `Step ${index} of 3` : `Paso ${index} de 3`}
         </span>
         <span className="flex gap-1" aria-hidden="true">
           {[1, 2, 3].map((n) => (
@@ -217,6 +226,8 @@ function EmailStep({
   onSubmit: (name: string, email: string) => void
 }) {
   const id = useId()
+  const language = usePrototype().language
+  const isV3 = useIsV3()
   const [name, setName] = useState(initialName)
   const [email, setEmail] = useState(initialEmail)
   const [consent, setConsent] = useState(Boolean(initialEmail))
@@ -236,21 +247,21 @@ function EmailStep({
       onSubmit={(e) => {
         e.preventDefault()
         const next: typeof errors = {}
-        if (!EMAIL_PATTERN.test(email.trim())) next.email = 'Escribe un correo válido, por ejemplo nombre@gmail.com'
-        if (!consent) next.consent = 'Necesitamos tu permiso para buscar este correo.'
+        if (!EMAIL_PATTERN.test(email.trim())) next.email = copyText('Escribe un correo válido, por ejemplo nombre@gmail.com', 'Enter a valid email address, such as name@gmail.com', isV3, language)
+        if (!consent) next.consent = copyText('Necesitamos tu permiso para buscar este correo.', 'We need your permission to search for this email address.', isV3, language)
         setErrors(next)
         if (Object.keys(next).length === 0) onSubmit(name.trim(), email.trim().toLowerCase())
       }}
     >
       <div className="-mx-6">
         <StepIntro
-          title="¿Qué correo vigilamos?"
-          text="Lo buscaremos en bases de datos de filtraciones conocidas y en cuentas vinculadas a él."
+          title={copyText('¿Qué correo vigilamos?', 'Which email should we monitor?', isV3, language)}
+          text={copyText('Lo buscaremos en bases de datos de filtraciones conocidas y en cuentas vinculadas a él.', 'We will check known breach databases and accounts linked to it.', isV3, language)}
         />
       </div>
 
       <label htmlFor={`${id}-name`} className="text-sm font-semibold">
-        ¿Cómo te llamas? <span className="font-normal text-muted-foreground">(opcional)</span>
+        {copyText('¿Cómo te llamas?', 'What is your name?', isV3, language)} <span className="font-normal text-muted-foreground">{copyText('(opcional)', '(optional)', isV3, language)}</span>
       </label>
       <input
         id={`${id}-name`}
@@ -262,7 +273,7 @@ function EmailStep({
       />
 
       <label htmlFor={`${id}-email`} className="mt-5 text-sm font-semibold">
-        Correo electrónico
+        {copyText('Correo electrónico', 'Email address', isV3, language)}
       </label>
       <div className="relative mt-2">
         <Mail className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -289,7 +300,7 @@ function EmailStep({
         </p>
       ) : (
         <p id={`${id}-email-hint`} className="mt-2 text-sm text-muted-foreground">
-          Te enviaremos un código para confirmar que es tuyo.
+          {copyText('Te enviaremos un código para confirmar que es tuyo.', 'We will send a code to verify it belongs to you.', isV3, language)}
         </p>
       )}
 
@@ -311,7 +322,7 @@ function EmailStep({
           <Check className={cn('size-3.5 text-primary-foreground', !consent && 'opacity-0')} strokeWidth={3} />
         </span>
         <span className="text-sm leading-relaxed">
-          Autorizo a Ctrl+Me a buscar este correo en fuentes públicas y filtraciones conocidas.
+          {copyText('Autorizo a Ctrl+Me a buscar este correo en fuentes públicas y filtraciones conocidas.', 'I allow Ctrl+Me to search public sources and known data breaches for this email.', isV3, language)}
         </span>
       </label>
       {errors.consent ? (
@@ -322,7 +333,7 @@ function EmailStep({
 
       <div className="mt-auto pt-8">
         <Button type="submit" size="touch" className="w-full">
-          Enviar código
+          {copyText('Enviar código', 'Send code', isV3, language)}
           <ArrowRight aria-hidden="true" />
         </Button>
       </div>
@@ -344,15 +355,18 @@ function CodeStep({
   onVerified: () => void
 }) {
   const [resent, setResent] = useState(false)
+  const [invalidCode, setInvalidCode] = useState(false)
+  const isV3 = useIsV3()
+  const language = usePrototype().language
 
   return (
     <div className="flex flex-1 flex-col px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
       <div className="-mx-6">
         <StepIntro
-          title="Revisa tu correo"
+          title={copyText('Revisa tu correo', 'Check your email', isV3, language)}
           text={
             <>
-              Hemos enviado un código de 6 dígitos a <strong className="font-semibold text-foreground">{email}</strong>.
+              {copyText('Hemos enviado un código de 6 dígitos a', 'We sent a 6-digit code to', isV3, language)} <strong className="font-semibold text-foreground">{email}</strong>.
             </>
           }
         />
@@ -361,12 +375,16 @@ function CodeStep({
       <InputOTP
         maxLength={6}
         value={code}
-        onChange={onCodeChange}
+        onChange={(value) => {
+          onCodeChange(value)
+          setInvalidCode(isV3 && value === '000000')
+        }}
         inputMode="numeric"
         pattern="^[0-9]*$"
         autoComplete="one-time-code"
-        aria-label="Código de verificación de 6 dígitos"
-        aria-describedby="verification-code-hint"
+        aria-label={copyText('Código de verificación de 6 dígitos', '6-digit verification code', isV3, language)}
+        aria-invalid={isV3 && invalidCode ? true : undefined}
+        aria-describedby={isV3 && invalidCode ? 'verification-code-hint verification-code-error' : 'verification-code-hint'}
         containerClassName="justify-center"
       >
         <InputOTPGroup className="gap-2">
@@ -381,24 +399,30 @@ function CodeStep({
       </InputOTP>
 
       <p id="verification-code-hint" className="mt-4 text-center text-sm text-muted-foreground">
-        Prototipo: cualquier código de 6 dígitos funciona.
+        {copyText('Prototipo: cualquier código de 6 dígitos funciona.', 'Test: any 6-digit code works except 000000.', isV3, language)}
       </p>
+      {isV3 && invalidCode ? (
+        <div id="verification-code-error" role="alert" className="mt-3 flex items-start gap-2 rounded-xl border border-destructive bg-destructive-soft p-3 text-sm text-destructive">
+          <span className="font-semibold">{copyText('Código no válido.', 'Invalid code.', isV3, language)}</span>
+          <span>{copyText('Comprueba los seis dígitos e inténtalo de nuevo.', 'Check the six digits and try again.', isV3, language)}</span>
+        </div>
+      ) : null}
 
       <div className="mt-6 flex justify-center gap-2">
         <Button variant="ghost" size="touch-sm" onClick={() => setResent(true)} disabled={resent}>
-          {resent ? 'Código reenviado' : 'Reenviar código'}
+          {resent ? copyText('Código reenviado', 'Code resent', isV3, language) : copyText('Reenviar código', 'Resend code', isV3, language)}
         </Button>
         <Button variant="ghost" size="touch-sm" onClick={onChangeEmail}>
-          Cambiar correo
+          {copyText('Cambiar correo', 'Change email', isV3, language)}
         </Button>
       </div>
       <p className="sr-only" aria-live="polite">
-        {resent ? 'Te hemos enviado un nuevo código.' : ''}
+        {resent ? copyText('Te hemos enviado un nuevo código.', 'We sent you a new code.', isV3, language) : ''}
       </p>
 
       <div className="mt-auto pt-8">
-        <Button size="touch" className="w-full" disabled={code.length < 6} onClick={onVerified}>
-          Verificar
+        <Button size="touch" className="w-full" disabled={code.length < 6 || (isV3 && invalidCode)} onClick={onVerified}>
+          {copyText('Verificar', 'Verify', isV3, language)}
         </Button>
       </div>
     </div>
@@ -407,6 +431,8 @@ function CodeStep({
 
 function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 'instagram' | 'googleConnected'>) => void }) {
   const id = useId()
+  const language = usePrototype().language
+  const isV3 = useIsV3()
   const [google, setGoogle] = useState(true)
   const [instagram, setInstagram] = useState('')
   const [phone, setPhone] = useState('')
@@ -421,8 +447,8 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
     >
       <div className="-mx-6">
         <StepIntro
-          title="Amplía el análisis"
-          text="Cuantos más datos nos indiques, más preciso será tu resultado. Todo es opcional."
+          title={copyText('Amplía el análisis', 'Expand your scan', isV3, language)}
+          text={copyText('Cuantos más datos nos indiques, más preciso será tu resultado. Todo es opcional.', 'The more details you share, the more accurate your results. Everything is optional.', isV3, language)}
         />
       </div>
 
@@ -436,10 +462,10 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
           </span>
           <div className="min-w-0 flex-1">
             <label htmlFor={`${id}-google`} className="block font-semibold">
-              Conectar cuenta de Google
+              {copyText('Conectar cuenta de Google', 'Connect Google account', isV3, language)}
             </label>
             <p id={`${id}-google-hint`} className="mt-0.5 text-sm leading-snug text-muted-foreground">
-              Para ver qué dispositivos tienen tu sesión abierta. Solo lectura.
+              {copyText('Para ver qué dispositivos tienen tu sesión abierta. Solo lectura.', 'See which devices are signed in. Read-only access.', isV3, language)}
             </p>
           </div>
           <Switch
@@ -453,7 +479,7 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
       </div>
 
       <label htmlFor={`${id}-ig`} className="mt-6 text-sm font-semibold">
-        Usuario de Instagram
+        {copyText('Usuario de Instagram', 'Instagram username', isV3, language)}
       </label>
       <div className="relative mt-2">
         <AtSign className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -469,11 +495,11 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
         />
       </div>
       <p id={`${id}-ig-hint`} className="mt-2 text-sm text-muted-foreground">
-        Revisamos solo lo que cualquiera puede ver en tu perfil.
+        {copyText('Revisamos solo lo que cualquiera puede ver en tu perfil.', 'We only check information anyone can see on your profile.', isV3, language)}
       </p>
 
       <label htmlFor={`${id}-phone`} className="mt-5 text-sm font-semibold">
-        Teléfono móvil
+        {copyText('Teléfono móvil', 'Mobile phone', isV3, language)}
       </label>
       <div className="relative mt-2">
         <Phone className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -490,12 +516,12 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
         />
       </div>
       <p id={`${id}-phone-hint`} className="mt-2 text-sm text-muted-foreground">
-        Lo buscaremos también en filtraciones.
+        {copyText('Lo buscaremos también en filtraciones.', 'We will also check it against known data breaches.', isV3, language)}
       </p>
 
       <div className="mt-auto pt-8">
         <Button type="submit" size="touch" className="w-full">
-          Iniciar análisis
+          {copyText('Iniciar análisis', 'Start scan', isV3, language)}
           <ArrowRight aria-hidden="true" />
         </Button>
       </div>
@@ -504,16 +530,18 @@ function ConnectStep({ onSubmit }: { onSubmit: (extra: Pick<Identity, 'phone' | 
 }
 
 function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void }) {
+  const language = usePrototype().language
+  const isV3 = useIsV3()
   const checks = [
-    { label: 'Buscando tu correo en filtraciones conocidas', result: '1 filtración encontrada' },
-    identity.phone ? { label: 'Comprobando tu teléfono', result: 'Sin coincidencias' } : null,
+    { label: copyText('Buscando tu correo en filtraciones conocidas', 'Checking known data breaches for your email', isV3, language), result: copyText('1 filtración encontrada', '1 breach found', isV3, language) },
+    identity.phone ? { label: copyText('Comprobando tu teléfono', 'Checking your phone number', isV3, language), result: copyText('Sin coincidencias', 'No matches', isV3, language) } : null,
     identity.instagram
-      ? { label: `Revisando el perfil público @${identity.instagram}`, result: 'Perfil público, 12 fotos' }
-      : { label: 'Buscando perfiles públicos con tu nombre', result: '4 plataformas' },
+      ? { label: copyText(`Revisando el perfil público @${identity.instagram}`, `Reviewing the public profile @${identity.instagram}`, isV3, language), result: copyText('Perfil público, 12 fotos', 'Public profile, 12 photos', isV3, language) }
+      : { label: copyText('Buscando perfiles públicos con tu nombre', 'Searching public profiles for your name', isV3, language), result: copyText('4 plataformas', '4 platforms', isV3, language) },
     identity.googleConnected
-      ? { label: 'Consultando sesiones de tu cuenta de Google', result: '2 sesiones sospechosas' }
+      ? { label: copyText('Consultando sesiones de tu cuenta de Google', 'Checking sessions on your Google account', isV3, language), result: copyText('2 sesiones sospechosas', '2 suspicious sessions', isV3, language) }
       : null,
-    { label: 'Detectando cuentas antiguas vinculadas', result: '3 cuentas inactivas' },
+    { label: copyText('Detectando cuentas antiguas vinculadas', 'Finding old linked accounts', isV3, language), result: copyText('3 cuentas inactivas', '3 inactive accounts', isV3, language) },
   ].filter((c): c is { label: string; result: string } => c !== null)
 
   const [completed, setCompleted] = useState(0)
@@ -521,7 +549,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
 
   useEffect(() => {
     if (finished) {
-      document.title = 'Análisis completado · Ctrl+Me'
+      document.title = `${copyText('Análisis completado', 'Scan complete', isV3, language)} · Ctrl+Me`
       return
     }
     const timer = setTimeout(() => setCompleted((c) => c + 1), 1100)
@@ -549,7 +577,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
       </div>
 
       <h1 tabIndex={-1} className="mt-6 text-center font-serif text-[2.25rem] leading-tight tracking-tight">
-        {finished ? 'Análisis completado' : 'Analizando tu huella'}
+        {finished ? copyText('Análisis completado', 'Scan complete', isV3, language) : copyText('Analizando tu huella', 'Analyzing your digital footprint', isV3, language)}
       </h1>
       <p
         className="mt-1 text-center text-[0.9375rem] text-muted-foreground"
@@ -557,7 +585,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
         aria-live="polite"
         aria-atomic="true"
       >
-        {finished ? 'Ya tenemos tu primera puntuación.' : `${completed + 1} de ${checks.length} comprobaciones`}
+        {finished ? copyText('Ya tenemos tu primera puntuación.', 'Your first score is ready.', isV3, language) : isV3 && language === 'en' ? `${completed + 1} of ${checks.length} checks` : `${completed + 1} de ${checks.length} comprobaciones`}
         {!finished ? <span className="sr-only">: {checks[completed]?.label}</span> : null}
       </p>
 
@@ -598,7 +626,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
 
       <div className="mt-auto pt-8">
         <Button size="touch" className="w-full" disabled={!finished} onClick={onDone}>
-          Ver mis resultados
+          {copyText('Ver mis resultados', 'View my results', isV3, language)}
           <ArrowRight aria-hidden="true" />
         </Button>
       </div>

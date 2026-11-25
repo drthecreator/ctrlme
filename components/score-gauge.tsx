@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { ChevronRight, Fingerprint } from 'lucide-react'
 import { getLevel, toneStyles, type Tone } from '@/lib/score'
 import { cn } from '@/lib/utils'
+import { t, usePrototype } from '@/lib/prototype-context'
 
 const CX = 130
 const CY = 130
@@ -67,6 +68,8 @@ function useAnimatedNumber(target: number) {
 export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
   const maskId = useId()
   const level = getLevel(score)
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
   const shown = useAnimatedNumber(score)
   const knob = pointAt(shown)
   const knobTone = getLevel(shown).tone
@@ -129,7 +132,7 @@ export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
           <p className="font-serif text-[4.5rem] leading-none tracking-tight tabular-nums">{Math.round(shown)}</p>
           <p className="mt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">de 100</p>
           <span className={cn('mt-2.5 rounded-full px-3 py-1 text-sm font-semibold', toneStyles[level.tone].soft)}>
-            {level.label}
+            {isV3 ? t(({ destructive: 'Protección escasa', warning: 'Protección media', success: 'Protección excelente' } as const)[level.tone], language) : level.label}
           </span>
         </div>
       </div>
@@ -149,10 +152,11 @@ export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
 }
 
 export function ScoreLegend() {
+  const isV3 = usePrototype().version === 'v3'
   const zones: { tone: Tone; label: string; range: string }[] = [
-    { tone: 'destructive', label: 'Bajo', range: '0–59' },
-    { tone: 'warning', label: 'Medio', range: '60–84' },
-    { tone: 'success', label: 'Alto', range: '85–100' },
+    { tone: 'destructive', label: isV3 ? 'Protección escasa' : 'Bajo', range: '0–59' },
+    { tone: 'warning', label: isV3 ? 'Protección media' : 'Medio', range: '60–84' },
+    { tone: 'success', label: isV3 ? 'Protección excelente' : 'Alto', range: '85–100' },
   ]
   return (
     <ul className="flex items-center justify-center gap-4 text-xs text-muted-foreground" aria-hidden="true">

@@ -12,9 +12,11 @@ import {
   type NetworkId,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 
 export function ProfilesPanel() {
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const networks = getUsedNetworks(state)
 
   const setPrivate = (id: NetworkId, value: boolean) =>
@@ -65,13 +67,13 @@ export function ProfilesPanel() {
                 <div className="min-w-0 flex-1">
                   <p className="text-[0.9375rem] font-semibold">{network.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isPublic ? 'Perfil público: lo ve cualquiera' : 'Perfil privado'}
+                    {copy(isPublic ? 'Perfil público: lo ve cualquiera' : 'Perfil privado')}
                   </p>
                 </div>
               </div>
               {isPublic ? (
                 <Button className="mt-3 w-full" variant="outline" size="touch-sm" onClick={() => setPrivate(network.id, true)}>
-                  Ya lo puse en privado
+                  {copy('Ya lo puse en privado')}
                   <span className="sr-only">: {network.name}</span>
                 </Button>
               ) : (
@@ -85,11 +87,11 @@ export function ProfilesPanel() {
       <div className="mt-8">
         <PanelIntro title="Publicaciones antiguas">
           {state.answers.postCount === 'pocas'
-            ? 'Tienes pocas publicaciones, así que no hace falta una revisión. Aun así, mira las más antiguas.'
-            : 'Las fotos y comentarios de hace años siguen visibles. Estas son las cifras aproximadas según tus respuestas.'}
+            ? copy('Tienes pocas publicaciones, así que no hace falta una revisión. Aun así, mira las más antiguas.')
+            : copy('Las fotos y comentarios de hace años siguen visibles. Estas son las cifras aproximadas según tus respuestas.')}
         </PanelIntro>
 
-        <ul className="flex flex-col gap-3" aria-label="Publicaciones antiguas">
+        <ul className="flex flex-col gap-3" aria-label={copy('Publicaciones antiguas')}>
           {networks.map((network) => {
             const reviewed = state.reviewedPosts.includes(network.id)
             const estimate = oldPostsEstimate(state, network.id)
@@ -103,8 +105,8 @@ export function ProfilesPanel() {
                     <p className="text-[0.9375rem] font-semibold">{network.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {estimate > 0
-                        ? `Unas ${estimate} publicaciones de hace más de 2 años`
-                        : 'Pocas publicaciones antiguas'}
+                        ? copy(`Unas ${estimate} publicaciones de hace más de 2 años`)
+                        : copy('Pocas publicaciones antiguas')}
                     </p>
                   </div>
                 </div>
@@ -112,7 +114,7 @@ export function ProfilesPanel() {
                   <DoneBar label="Publicaciones revisadas" onUndo={() => setReviewed(network.id, false)} />
                 ) : (
                   <Button className="mt-3 w-full" variant="outline" size="touch-sm" onClick={() => setReviewed(network.id, true)}>
-                    Ya las revisé
+                    {copy('Ya las revisé')}
                     <span className="sr-only">: {network.name}</span>
                   </Button>
                 )}
@@ -126,7 +128,7 @@ export function ProfilesPanel() {
           className={cn(buttonVariants({ variant: 'ghost', size: 'touch-sm' }), 'mt-3 w-full')}
         >
           <BookOpen aria-hidden="true" />
-          Cómo revisar lo que publicas
+          {copy('Cómo revisar lo que publicas')}
         </Link>
       </div>
     </>
