@@ -37,7 +37,9 @@ export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderPr
       : title
   const displayedSubtitle = v3 && title === 'Guías rápidas'
     ? language === 'en' ? 'Learn in 1 minute' : 'Aprende en 1 minuto'
-    : subtitle
+    : v3 && title === 'Plan para subir'
+      ? language === 'en' ? 'Actions ordered by their impact on your score.' : 'Acciones ordenadas por el impacto que tienen en tu puntuación.'
+      : subtitle
   return (
     <>
       <div className="sticky top-0 z-10 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-1 lg:pt-3">
