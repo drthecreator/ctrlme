@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { usePrototype } from '@/lib/prototype-context'
+import { localize, usePrototype } from '@/lib/prototype-context'
 
 type ScreenProps = {
   children: React.ReactNode
@@ -53,11 +53,11 @@ export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderPr
       </div>
       <header className="px-5 pt-1 pb-5">
         <h1 tabIndex={-1} className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance lg:text-[2.75rem]">
-          {displayedTitle}
+          {v3 ? localize(displayedTitle, language) : displayedTitle}
         </h1>
         {displayedSubtitle ? (
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground lg:text-base">
-            {displayedSubtitle}
+            {v3 ? localize(displayedSubtitle, language) : displayedSubtitle}
           </p>
         ) : null}
       </header>

@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { hasOpenBreach, useIdentity } from '@/lib/identity-store'
+import { localize, usePrototype } from '@/lib/prototype-context'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -31,6 +32,8 @@ const isActive = (pathname: string, matches: string[]) =>
 export function BottomNav() {
   const pathname = usePathname()
   const { state } = useIdentity()
+  const { version, language } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
 
   if (pathname === '/' && !state.onboarded) return null
 
@@ -54,7 +57,7 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Navegación principal"
+      aria-label={copy('Navegación principal')}
       className="border-t border-border/80 bg-card px-3 pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] lg:hidden"
     >
       <ul className="grid grid-cols-4 gap-0.5">
@@ -80,11 +83,11 @@ export function BottomNav() {
                   {badge ? (
                     <span className="absolute top-0.5 right-2.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] leading-none font-bold text-white ring-2 ring-card">
                       {badge}
-                      <span className="sr-only"> alerta nueva</span>
+                      <span className="sr-only"> {copy('alerta nueva')}</span>
                     </span>
                   ) : null}
                 </span>
-                {label}
+                {copy(label)}
               </Link>
             </li>
           )
@@ -95,6 +98,8 @@ export function BottomNav() {
 }
 
 function SideLink({ href, label, icon: Icon, matches, badge, pathname }: NavItem & { pathname: string }) {
+  const { version, language } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
   const active = isActive(pathname, matches)
   return (
     <li>
@@ -120,7 +125,7 @@ function SideLink({ href, label, icon: Icon, matches, badge, pathname }: NavItem
         {badge ? (
           <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] leading-none font-bold text-white">
             {badge}
-            <span className="sr-only"> pendiente</span>
+            <span className="sr-only"> {copy('pendiente')}</span>
           </span>
         ) : null}
       </Link>
@@ -131,6 +136,8 @@ function SideLink({ href, label, icon: Icon, matches, badge, pathname }: NavItem
 export function SideNav() {
   const pathname = usePathname()
   const { state } = useIdentity()
+  const { version, language } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
   const name = state.identity.name.trim()
   const email = state.identity.emails[0]?.address
   const pendingRequests = state.circle.incoming.length
@@ -159,7 +166,7 @@ export function SideNav() {
       <Link
         href="/"
         className="flex items-center gap-3 rounded-2xl px-2 py-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-        aria-label="Ctrl+Me, ir a Principal"
+          aria-label={copy('Ctrl+Me, ir a Principal')}
       >
         <span className="flex size-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
           <Fingerprint className="size-5" aria-hidden="true" />
@@ -169,24 +176,24 @@ export function SideNav() {
         </span>
       </Link>
 
-      <nav aria-label="Navegación principal" className="mt-9 flex flex-col gap-6">
+        <nav aria-label={copy('Navegación principal')} className="mt-9 flex flex-col gap-6">
         <div>
           <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
-            Tu identidad
+            {copy('Tu identidad')}
           </p>
           <ul className="flex flex-col gap-1">
             {main.map((item) => (
-              <SideLink key={item.href} {...item} pathname={pathname} />
+              <SideLink key={item.href} {...item} label={copy(item.label)} pathname={pathname} />
             ))}
           </ul>
         </div>
         <div>
           <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
-            Gente de confianza
+            {copy('Gente de confianza')}
           </p>
           <ul className="flex flex-col gap-1">
             {trusted.map((item) => (
-              <SideLink key={item.href} {...item} pathname={pathname} />
+              <SideLink key={item.href} {...item} label={copy(item.label)} pathname={pathname} />
             ))}
           </ul>
         </div>
@@ -211,9 +218,9 @@ export function SideNav() {
           <Sparkles className="size-5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-serif text-xl leading-tight">Asistente</span>
+          <span className="block font-serif text-xl leading-tight">{copy('Asistente')}</span>
           <span className={cn('block text-xs', assistantActive ? 'opacity-75' : 'text-primary-foreground/60')}>
-            Escribe o habla con él
+            {copy('Escribe o habla con él')}
           </span>
         </span>
         <ChevronRight
@@ -225,7 +232,7 @@ export function SideNav() {
       <div className="mt-auto flex flex-col gap-3 pt-8">
         <p className="flex items-center gap-2 px-2 text-xs leading-snug text-primary-foreground/55">
           <ShieldCheck className="size-4 shrink-0 text-accent" aria-hidden="true" />
-          Tus datos están cifrados y son solo tuyos.
+          {copy('Tus datos están cifrados y son solo tuyos.')}
         </p>
         <Link
           href="/perfil"

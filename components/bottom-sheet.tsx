@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 
 type BottomSheetProps = {
   open: boolean
@@ -14,6 +15,7 @@ type BottomSheetProps = {
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 export function BottomSheet({ open, onClose, title, children }: BottomSheetProps) {
+  const copy = usePrototypeCopy()
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
   const onCloseRef = useRef(onClose)
@@ -59,7 +61,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
       <button
         type="button"
         tabIndex={-1}
-        aria-label="Cerrar"
+        aria-label={copy('Cerrar')}
         onClick={onClose}
         className="absolute inset-0 bg-foreground/45 animate-in fade-in duration-200"
       />
@@ -82,7 +84,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
             className="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-border"
           >
             <X className="size-5" aria-hidden="true" />
-            <span className="sr-only">Cerrar</span>
+            <span className="sr-only">{copy('Cerrar')}</span>
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-8">{children}</div>

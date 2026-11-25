@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ChevronDown, ClipboardCheck, Fingerprint, TrendingUp, UserRoundCog, Users } from 'lucide-react'
+import { localize, usePrototype } from '@/lib/prototype-context'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,8 @@ const menu = [
 
 export function HomeHeader({ name, email = '' }: { name: string; email?: string }) {
   const router = useRouter()
+  const { version, language } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
   const initial = (name.trim()[0] ?? email[0] ?? '?').toUpperCase()
 
   return (
@@ -40,7 +43,7 @@ export function HomeHeader({ name, email = '' }: { name: string; email?: string 
           >
             {initial}
           </span>
-          Mi perfil
+          {copy('Mi perfil')}
           <ChevronDown className="size-4 text-muted-foreground" aria-hidden="true" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64 rounded-2xl p-1.5">
@@ -51,7 +54,7 @@ export function HomeHeader({ name, email = '' }: { name: string; email?: string 
             <UserRoundCog aria-hidden="true" />
             <span className="flex flex-col">
               <span className="font-medium">{name || 'Mi perfil'}</span>
-              <span className="text-xs text-muted-foreground">Datos vigilados y ajustes</span>
+              <span className="text-xs text-muted-foreground">{copy('Datos vigilados y ajustes')}</span>
             </span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -62,7 +65,7 @@ export function HomeHeader({ name, email = '' }: { name: string; email?: string 
               onClick={() => router.push(item.href)}
             >
               <item.icon aria-hidden="true" />
-              {item.label}
+              {copy(item.label)}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

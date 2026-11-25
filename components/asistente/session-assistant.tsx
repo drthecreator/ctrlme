@@ -26,6 +26,7 @@ import {
   type SessionKind,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 
 const kindIcon: Record<SessionKind, LucideIcon> = {
   iphone: Smartphone,
@@ -37,6 +38,7 @@ type Phase = { type: 'intro' } | { type: 'session'; id: string } | { type: 'pass
 
 export function SessionAssistant() {
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const [queue] = useState(() => getSuspiciousSessions(state).map((s) => s.id))
   const [startScore] = useState(() => computeScore(state).total)
   const [phaseIndex, setPhaseIndex] = useState(0)
@@ -56,16 +58,16 @@ export function SessionAssistant() {
     return (
       <Panel>
         <IconBadge icon={Globe} />
-        <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">Conecta tu cuenta de Google</h2>
+        <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">{copy('Conecta tu cuenta de Google')}</h2>
         <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted-foreground">
-          Así podremos ver qué dispositivos tienen tu sesión abierta. Acceso de solo lectura.
+          {copy('Así podremos ver qué dispositivos tienen tu sesión abierta. Acceso de solo lectura.')}
         </p>
         <Button
           size="touch"
           className="mt-5 w-full"
           onClick={() => update((s) => ({ ...s, identity: { ...s.identity, googleConnected: true } }))}
         >
-          Conectar Google
+          {copy('Conectar Google')}
         </Button>
       </Panel>
     )
@@ -75,12 +77,12 @@ export function SessionAssistant() {
     return (
       <Panel>
         <IconBadge icon={ShieldCheck} tone="success" />
-        <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">No hay sesiones sospechosas</h2>
+        <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">{copy('No hay sesiones sospechosas')}</h2>
         <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted-foreground">
-          Todos los dispositivos conectados están revisados.
+          {copy('Todos los dispositivos conectados están revisados.')}
         </p>
         <Link href="/" className={cn(buttonVariants({ size: 'touch' }), 'mt-5 w-full')}>
-          Volver al inicio
+          {copy('Volver al inicio')}
         </Link>
       </Panel>
     )
@@ -95,12 +97,12 @@ export function SessionAssistant() {
         <div className="mb-4">
           <div className="flex items-baseline justify-between text-sm">
             <p className="font-semibold">
-              Paso {stepNumber} de {totalSteps}
+              {copy('Paso')} {stepNumber} {copy('de')} {totalSteps}
             </p>
           </div>
           <div
             role="progressbar"
-            aria-label="Progreso del asistente"
+            aria-label={copy('Progreso del asistente')}
             aria-valuemin={0}
             aria-valuemax={totalSteps}
             aria-valuenow={stepNumber}
@@ -119,18 +121,18 @@ export function SessionAssistant() {
           <Panel align="start">
             <IconBadge icon={ShieldCheck} />
             <h2 className="mt-4 font-serif text-[1.75rem] leading-tight text-balance">
-              Revisemos {queue.length} {queue.length === 1 ? 'dispositivo' : 'dispositivos'} juntos
+              {copy(`Revisemos ${queue.length} ${queue.length === 1 ? 'dispositivo' : 'dispositivos'} juntos`)}
             </h2>
             <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted-foreground">
-              Te mostraremos cada sesión abierta en tu cuenta de Google. Solo tienes que decirnos si la reconoces.
+              {copy('Te mostraremos cada sesión abierta en tu cuenta de Google. Solo tienes que decirnos si la reconoces.')}
             </p>
             <ol className="mt-5 flex w-full flex-col gap-3 text-left text-[0.9375rem]">
-              <IntroStep n={1} text="Revisa cada dispositivo conectado" />
-              <IntroStep n={2} text="Cierra los que no reconozcas" />
-              <IntroStep n={3} text="Asegura tu cuenta con una clave nueva" />
+              <IntroStep n={1} text={copy('Revisa cada dispositivo conectado')} />
+              <IntroStep n={2} text={copy('Cierra los que no reconozcas')} />
+              <IntroStep n={3} text={copy('Asegura tu cuenta con una clave nueva')} />
             </ol>
             <Button size="touch" className="mt-6 w-full" onClick={next}>
-              Empezar revisión
+              {copy('Empezar revisión')}
               <ArrowRight aria-hidden="true" />
             </Button>
           </Panel>
@@ -141,9 +143,9 @@ export function SessionAssistant() {
         {phase.type === 'password' ? (
           <Panel align="start">
             <IconBadge icon={KeyRound} tone="warning" />
-            <h2 className="mt-4 font-serif text-[1.75rem] leading-tight text-balance">Cambia tu contraseña de Google</h2>
+            <h2 className="mt-4 font-serif text-[1.75rem] leading-tight text-balance">{copy('Cambia tu contraseña de Google')}</h2>
             <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted-foreground">
-              Si alguien tenía tu sesión abierta, podría conocer tu clave. Cambiarla cierra cualquier acceso restante.
+              {copy('Si alguien tenía tu sesión abierta, podría conocer tu clave. Cambiarla cierra cualquier acceso restante.')}
             </p>
             <a
               href="https://myaccount.google.com/signinoptions/password"
@@ -151,13 +153,13 @@ export function SessionAssistant() {
               rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: 'outline', size: 'touch' }), 'mt-5 w-full')}
             >
-              Abrir Google
+              {copy('Abrir Google')}
               <ExternalLink aria-hidden="true" />
-              <span className="sr-only"> (se abre en una pestaña nueva)</span>
+              <span className="sr-only"> ({copy('se abre en una pestaña nueva')})</span>
             </a>
             <div className="mt-3 grid w-full grid-cols-2 gap-2">
               <Button variant="ghost" size="touch" onClick={next}>
-                Más tarde
+                {copy('Más tarde')}
               </Button>
               <Button
                 size="touch"
@@ -166,7 +168,7 @@ export function SessionAssistant() {
                   next()
                 }}
               >
-                Ya la cambié
+                {copy('Ya la cambié')}
               </Button>
             </div>
           </Panel>
@@ -182,6 +184,7 @@ export function SessionAssistant() {
 
 function SessionReview({ id, onDecided }: { id: string; onDecided: () => void }) {
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const session = SESSIONS.find((s) => s.id === id)!
   const Icon = kindIcon[session.kind]
   const email = state.identity.emails[0]?.address
@@ -199,31 +202,31 @@ function SessionReview({ id, onDecided }: { id: string; onDecided: () => void })
         </span>
         <div className="min-w-0">
           <h2 id={`session-${id}`} className="text-lg leading-tight font-semibold">
-            {session.device}
+            {copy(session.device)}
           </h2>
-          <p className="text-sm text-muted-foreground">{session.browser}</p>
+          <p className="text-sm text-muted-foreground">{copy(session.browser)}</p>
         </div>
       </div>
 
       <dl className="mt-5 flex flex-col divide-y divide-border/70 rounded-2xl bg-muted/60 px-4 text-sm">
-        <Detail icon={MapPin} label="Ubicación" value={session.location} />
-        <Detail icon={Globe} label="Dirección IP" value={session.ip} mono />
-        <Detail icon={Clock} label="Última actividad" value={session.lastActive} />
-        <Detail icon={Smartphone} label="Primer acceso" value={session.firstSeen} />
+        <Detail icon={MapPin} label={copy('Ubicación')} value={copy(session.location)} />
+        <Detail icon={Globe} label={copy('Dirección IP')} value={session.ip} mono />
+        <Detail icon={Clock} label={copy('Última actividad')} value={copy(session.lastActive)} />
+        <Detail icon={Smartphone} label={copy('Primer acceso')} value={copy(session.firstSeen)} />
       </dl>
       <p className="mt-3 text-sm text-muted-foreground">
-        Conectado a <span className="font-medium text-foreground">{email}</span>
+        {copy('Conectado a')} <span className="font-medium text-foreground">{email}</span>
       </p>
 
-      <p className="mt-5 text-[1.0625rem] font-semibold">¿Reconoces este dispositivo?</p>
+      <p className="mt-5 text-[1.0625rem] font-semibold">{copy('¿Reconoces este dispositivo?')}</p>
       <div className="mt-3 flex flex-col gap-2">
         <Button variant="destructive" size="touch" onClick={() => decide('closed')}>
           <LogOut aria-hidden="true" />
-          No, cerrar sesión
+          {copy('No, cerrar sesión')}
         </Button>
         <Button variant="outline" size="touch" onClick={() => decide('trusted')}>
           <Check aria-hidden="true" />
-          Sí, es mío
+          {copy('Sí, es mío')}
         </Button>
       </div>
     </section>
@@ -240,6 +243,7 @@ function Summary({
   passwordChanged: boolean
 }) {
   const { state } = useIdentity()
+  const copy = usePrototypeCopy()
   const score = computeScore(state).total
   const closed = queue.filter((id) => state.sessionStatus[id] === 'closed').length
   const trusted = queue.length - closed
@@ -247,9 +251,9 @@ function Summary({
   return (
     <Panel>
       <IconBadge icon={ShieldCheck} tone="success" />
-      <h2 className="mt-4 font-serif text-[2rem] leading-tight">Cuenta asegurada</h2>
+      <h2 className="mt-4 font-serif text-[2rem] leading-tight">{copy('Cuenta asegurada')}</h2>
       <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-        Tu puntuación ha subido de {startScore} a{' '}
+        {copy('Tu puntuación ha subido de')} {startScore} {copy('a')}{' '}
         <strong className="font-semibold text-success">{score}</strong>.
       </p>
       <ul className="mt-5 flex w-full flex-col gap-2 text-left text-[0.9375rem]">
@@ -260,11 +264,11 @@ function Summary({
         {passwordChanged ? <SummaryRow text="Contraseña de Google actualizada" /> : null}
       </ul>
       <Link href="/plan" className={cn(buttonVariants({ size: 'touch' }), 'mt-6 w-full')}>
-        Siguiente mejora
+        {copy('Siguiente mejora')}
         <ArrowRight aria-hidden="true" />
       </Link>
       <Link href="/" className={cn(buttonVariants({ variant: 'ghost', size: 'touch' }), 'mt-2 w-full')}>
-        Volver al inicio
+        {copy('Volver al inicio')}
       </Link>
     </Panel>
   )
@@ -313,10 +317,11 @@ function IntroStep({ n, text }: { n: number; text: string }) {
 }
 
 function SummaryRow({ text }: { text: string }) {
+  const copy = usePrototypeCopy()
   return (
     <li className="flex items-center gap-3 rounded-2xl bg-success-soft px-4 py-3 font-medium text-success">
       <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-      {text}
+      {copy(text)}
     </li>
   )
 }

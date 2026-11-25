@@ -2,14 +2,16 @@
 
 import { AtSign, Mail, RefreshCw } from 'lucide-react'
 import { formatRelative, useIdentity } from '@/lib/identity-store'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 
 export function ScanMeta() {
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const { emails, instagram } = state.identity
 
   return (
     <div className="mx-5 mb-4 flex items-center gap-2">
-      <ul className="flex min-w-0 flex-1 flex-wrap gap-1.5" aria-label="Fuentes analizadas">
+      <ul className="flex min-w-0 flex-1 flex-wrap gap-1.5" aria-label={copy('Fuentes analizadas')}>
         {emails.map((email) => (
           <li
             key={email.address}
@@ -33,7 +35,7 @@ export function ScanMeta() {
       >
         <RefreshCw className="size-3.5" aria-hidden="true" />
         {formatRelative(state.scannedAt, Date.now())}
-        <span className="sr-only">. Volver a analizar</span>
+        <span className="sr-only">. {copy('Volver a analizar')}</span>
       </button>
     </div>
   )

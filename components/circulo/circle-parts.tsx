@@ -1,4 +1,5 @@
 import { CIRCLE_SCOPES, initials, type CircleScope } from '@/lib/circle'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 import { cn } from '@/lib/utils'
 
 const SCOPE_SHORT: Record<CircleScope, string> = {
@@ -22,11 +23,12 @@ export function Avatar({ name, size = 'md' }: { name: string; size?: 'md' | 'lg'
 }
 
 export function ScopeChips({ scopes }: { scopes: CircleScope[] }) {
+  const copy = usePrototypeCopy()
   return (
     <ul className="flex flex-wrap gap-1.5">
       {CIRCLE_SCOPES.filter((s) => scopes.includes(s.id)).map((s) => (
         <li key={s.id} className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
-          {SCOPE_SHORT[s.id]}
+          {copy(SCOPE_SHORT[s.id])}
         </li>
       ))}
     </ul>

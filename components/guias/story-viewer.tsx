@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button'
 import { formatDuration, type Pill } from '@/lib/guides'
 import { PillGlyph } from '@/components/guias/pill-visuals'
 import { cn } from '@/lib/utils'
-import { useIsV3 } from '@/lib/prototype-context'
+import { localize, usePrototype } from '@/lib/prototype-context'
 
 const WORDS_PER_SECOND = 2.6
 
 export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () => void }) {
-  const isV3 = useIsV3()
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(true)
@@ -50,7 +52,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
   useEffect(() => {
     if (!pill || !slide || !narrate || !playing || !canSpeak) return
     const utterance = new SpeechSynthesisUtterance(`${slide.heading}. ${slide.body}`)
-    utterance.lang = 'es-ES'
+    utterance.lang = language === 'en' ? 'en-US' : 'es-ES'
     utterance.onend = () => advance()
     window.speechSynthesis.cancel()
     window.speechSynthesis.speak(utterance)
@@ -98,14 +100,14 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
 
           <div className="mt-3 flex items-center gap-1">
             <p id="story-title" className="mr-auto min-w-0 truncate text-sm font-medium text-primary-foreground/75">
-              {pill.title}
+              {copy(pill.title)}
             </p>
             <Button
               variant="ghost"
               size="icon-lg"
               onClick={() => setPlaying((p) => !p)}
               className="size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              aria-label={playing ? 'Pausar' : 'Reproducir'}
+              aria-label={copy(playing ? 'Pausar' : 'Reproducir')}
             >
               {playing ? <Pause className="size-5" aria-hidden="true" /> : <Play className="size-5" aria-hidden="true" />}
             </Button>
@@ -122,7 +124,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                   'size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground',
                   narrate && 'bg-primary-foreground/15',
                 )}
-                aria-label={narrate ? 'Desactivar narración' : 'Activar narración en voz alta'}
+                aria-label={copy(narrate ? 'Desactivar narración' : 'Activar narración en voz alta')}
               >
                 {narrate ? <Volume2 className="size-5" aria-hidden="true" /> : <VolumeX className="size-5" aria-hidden="true" />}
               </Button>
@@ -132,7 +134,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
               size="icon-lg"
               onClick={onClose}
               className={cn('size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground', isV3 && 'border border-primary-foreground/40 bg-primary-foreground/15')}
-              aria-label="Cerrar historia"
+              aria-label={copy('Cerrar historia')}
             >
               <X className="size-5" aria-hidden="true" />
             </Button>
@@ -150,7 +152,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
             </div>
 
             <p className="text-sm font-semibold tracking-[0.12em] text-accent uppercase">
-              {index + 1} de {slides.length} · {formatDuration(pill.seconds)}
+              {index + 1} {copy('de')} {slides.length} · {formatDuration(pill.seconds)}
             </p>
             <h2
               aria-live="polite"
@@ -158,11 +160,11 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
               className="mt-2 font-serif text-4xl leading-[1.08] text-balance motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500"
             >
               <span className="sr-only">
-                Diapositiva {index + 1} de {slides.length}.{' '}
+                {copy('Diapositiva')} {index + 1} {copy('de')} {slides.length}.{' '}
               </span>
-              {slide.heading}
+              {copy(slide.heading)}
             </h2>
-            <p className="mt-3 text-lg leading-relaxed text-pretty text-primary-foreground/80">{slide.body}</p>
+            <p className="mt-3 text-lg leading-relaxed text-pretty text-primary-foreground/80">{copy(slide.body)}</p>
 
             {slide.example ? (
               <figure
@@ -175,16 +177,16 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                   {slide.example.tone === 'bad' ? (
                     <>
                       <TriangleAlert className="size-4 text-destructive" aria-hidden="true" />
-                      Ejemplo de riesgo
+                      {copy('Ejemplo de riesgo')}
                     </>
                   ) : (
                     <>
                       <Check className="size-4 text-accent" aria-hidden="true" />
-                      Así sí
+                      {copy('Así sí')}
                     </>
                   )}
                 </figcaption>
-                <blockquote className="mt-1.5 text-base leading-snug font-medium">{slide.example.text}</blockquote>
+                <blockquote className="mt-1.5 text-base leading-snug font-medium">{copy(slide.example.text)}</blockquote>
               </figure>
             ) : null}
           </div>
@@ -195,7 +197,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                 href={pill.next.href}
                 className="flex h-12 items-center justify-center rounded-2xl bg-accent px-5 text-base font-semibold text-accent-foreground hover:bg-accent/85"
               >
-                {pill.next.label}
+                {copy(pill.next.label)}
               </Link>
             ) : null}
             <div className="flex gap-3">
@@ -206,7 +208,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                 onClick={() => setIndex((i) => i - 1)}
                 className="flex-1 border border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
               >
-                Anterior
+                {copy('Anterior')}
               </Button>
               {isLast && pill.next ? (
                 <Button
@@ -215,7 +217,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                   onClick={onClose}
                   className="flex-1 border border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 >
-                  Terminar
+                  {copy('Terminar')}
                 </Button>
               ) : (
                 <Button
@@ -224,7 +226,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                   onClick={() => (isLast ? onClose() : setIndex((i) => i + 1))}
                   className="flex-[2]"
                 >
-                  {isLast ? 'Terminar' : 'Siguiente'}
+                  {copy(isLast ? 'Terminar' : 'Siguiente')}
                 </Button>
               )}
             </div>

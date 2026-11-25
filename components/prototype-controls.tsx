@@ -92,7 +92,7 @@ export function PrototypeControls() {
         <button type="button" onClick={() => setShowPicker(true)} className="rounded-full border border-border bg-card/95 px-3 py-2 text-xs font-semibold shadow-sm" aria-label={language === 'en' ? 'Change prototype version' : 'Cambiar versión del prototipo'}>
           {version === 'v2' ? 'v1.0 & v2.0' : 'v3.0'}
         </button>
-        {version === 'v3' ? <button type="button" onClick={() => setShowShortcuts(true)} className="flex size-9 items-center justify-center rounded-full border border-border bg-card/95 shadow-sm" aria-label="Atajos de teclado"><Keyboard className="size-4" aria-hidden="true" /></button> : null}
+        {version === 'v3' ? <button type="button" onClick={() => setShowShortcuts(true)} className="flex size-9 items-center justify-center rounded-full border border-border bg-card/95 shadow-sm" aria-label={language === 'en' ? 'Keyboard shortcuts' : 'Atajos de teclado'}><Keyboard className="size-4" aria-hidden="true" /></button> : null}
       </div>
 
       {networkError ? (
@@ -124,7 +124,7 @@ export function PrototypeControls() {
 
       {showShortcuts ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 p-5" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowShortcuts(false) }}>
         <section role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl">
-          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-widest text-primary">Ctrl+Me v3.0</p><h2 id="shortcuts-title" className="mt-1 font-serif text-3xl">{language === 'en' ? 'Keyboard shortcuts' : 'Atajos de teclado'}</h2></div><button type="button" onClick={() => setShowShortcuts(false)} aria-label="Cerrar" className="flex size-10 items-center justify-center rounded-full border border-border bg-muted text-foreground"><X aria-hidden="true" /></button></div>
+          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-widest text-primary">Ctrl+Me v3.0</p><h2 id="shortcuts-title" className="mt-1 font-serif text-3xl">{language === 'en' ? 'Keyboard shortcuts' : 'Atajos de teclado'}</h2></div><button type="button" onClick={() => setShowShortcuts(false)} aria-label={language === 'en' ? 'Close' : 'Cerrar'} className="flex size-10 items-center justify-center rounded-full border border-border bg-muted text-foreground"><X aria-hidden="true" /></button></div>
           <h3 className="mt-6 text-sm font-semibold">{language === 'en' ? 'Quick shortcuts' : 'Atajos rápidos'}</h3>
           <dl className="mt-2 grid grid-cols-[1fr_auto] gap-2 text-sm"><dt>{language === 'en' ? 'Home / Cleanup / Alerts / Guides / Profile' : 'Principal / Limpieza / Alertas / Guías / Mi perfil'}</dt><dd><kbd>Shift+1…5</kbd></dd><dt>{language === 'en' ? 'Open this guide' : 'Abrir esta guía'}</dt><dd><kbd>?</kbd></dd><dt>{language === 'en' ? 'Close window' : 'Cerrar ventana'}</dt><dd><kbd>Esc</kbd></dd></dl>
           <h3 className="mt-6 text-sm font-semibold">{language === 'en' ? 'Standard navigation' : 'Navegación estándar'}</h3>

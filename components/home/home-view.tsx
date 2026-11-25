@@ -20,7 +20,7 @@ import {
   type IdentityState,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
-import { t, usePrototype } from '@/lib/prototype-context'
+import { localize, t, usePrototype } from '@/lib/prototype-context'
 
 export function HomeView() {
   const { state } = useIdentity()
@@ -288,18 +288,18 @@ function ActionCard({ state }: { state: IdentityState }) {
         {isV3 && suspicious.length > 0
           ? `${suspicious.length} ${t(suspicious.length === 1 ? 'sesión sospechosa' : 'sesiones sospechosas', prototype.language)}`
           : isV3 && hasOpenBreach(state) ? `${t('Filtración en', prototype.language)} ${BREACH.service}`
-            : isV3 && !plan.length ? t('Tu identidad está protegida', prototype.language) : content.title}
+            : isV3 && !plan.length ? t('Tu identidad está protegida', prototype.language) : isV3 ? localize(content.title, prototype.language) : content.title}
       </h2>
       <p className="mt-1 text-[0.9375rem] leading-relaxed text-primary-foreground/75">
         {isV3 && suspicious.length > 0 ? t('Dispositivos que no reconocemos siguen conectados a tu cuenta de Google.', prototype.language)
           : isV3 && hasOpenBreach(state) ? t('Tu contraseña antigua aparece en una base de datos filtrada.', prototype.language)
-            : isV3 && !plan.length ? t('Seguiremos vigilando y te avisaremos si detectamos algo nuevo.', prototype.language) : content.body}
+            : isV3 && !plan.length ? t('Seguiremos vigilando y te avisaremos si detectamos algo nuevo.', prototype.language) : isV3 ? localize(content.body, prototype.language) : content.body}
       </p>
       <Link href={content.href} className={cn(buttonVariants({ variant: 'accent', size: 'touch' }), 'mt-4 w-full')}>
         {isV3 && suspicious.length > 0 ? t('Resolver con asistente', prototype.language)
           : isV3 && hasOpenBreach(state) ? t('Ver qué hacer', prototype.language)
             : isV3 && !plan.length ? t('Ver tu huella digital', prototype.language)
-              : content.cta}
+              : isV3 ? localize(content.cta, prototype.language) : content.cta}
         <ArrowRight aria-hidden="true" />
       </Link>
     </div>

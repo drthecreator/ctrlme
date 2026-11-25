@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useIsV3, usePrototype } from '@/lib/prototype-context'
+import { localize, useIsV3, usePrototype } from '@/lib/prototype-context'
 import { Play } from 'lucide-react'
 import { featuredPills, formatDuration, pillCategories, pills, type Pill, type PillCategory } from '@/lib/guides'
 import { StoryViewer } from '@/components/guias/story-viewer'
@@ -14,7 +14,8 @@ const categoryLabel = Object.fromEntries(pillCategories.map((c) => [c.id, c.labe
 
 export function GuidesLibrary() {
   const isV3 = useIsV3()
-  const { language } = usePrototype()
+  const { language, version } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
   const [openPill, setOpenPill] = useState<Pill | null>(null)
   const [filter, setFilter] = useState<Filter>('todas')
 
@@ -39,9 +40,9 @@ export function GuidesLibrary() {
                   <PillGlyph name={pill.icon} className="size-20" />
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-lg leading-snug font-semibold text-balance">{pill.title}</h3>
+                  <h3 className="text-lg leading-snug font-semibold text-balance">{copy(pill.title)}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {formatDuration(pill.seconds)} · Historia visual · {categoryLabel[pill.category]}
+                    {formatDuration(pill.seconds)} · {copy('Historia visual')} · {copy(categoryLabel[pill.category])}
                   </p>
                   <button
                     type="button"
@@ -51,7 +52,7 @@ export function GuidesLibrary() {
                     <span className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <Play className="size-4 translate-x-px fill-current" aria-hidden="true" />
                     </span>
-                    Ver historia
+                    {copy('Ver historia')}
                     <span className="sr-only">: {pill.title}</span>
                   </button>
                 </div>
@@ -63,10 +64,10 @@ export function GuidesLibrary() {
 
       <section aria-labelledby="todas-title" className="mt-7 px-5">
         <h2 id="todas-title" className="mb-3 text-lg font-semibold tracking-tight">
-          Todas las píldoras
+          {copy('Todas las píldoras')}
         </h2>
 
-        <div role="group" aria-label="Filtrar por tema" className="-mx-5 mb-4 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div role="group" aria-label={copy('Filtrar por tema')} className="-mx-5 mb-4 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[{ id: 'todas' as const, label: 'Todas' }, ...pillCategories].map((option) => (
             <button
               key={option.id}
@@ -80,7 +81,7 @@ export function GuidesLibrary() {
                   : 'border-border bg-card text-foreground hover:bg-muted',
               )}
             >
-              {option.label}
+              {copy(option.label)}
             </button>
           ))}
         </div>
@@ -108,10 +109,10 @@ export function GuidesLibrary() {
                 </span>
                 <span className="flex flex-1 flex-col p-3.5">
                   <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    {categoryLabel[pill.category]}
+                    {copy(categoryLabel[pill.category])}
                   </span>
-                  <span className="mt-1 text-[0.9375rem] leading-snug font-semibold text-balance">{pill.title}</span>
-                  <span className="mt-1.5 text-sm leading-snug text-muted-foreground">{pill.summary}</span>
+                  <span className="mt-1 text-[0.9375rem] leading-snug font-semibold text-balance">{copy(pill.title)}</span>
+                  <span className="mt-1.5 text-sm leading-snug text-muted-foreground">{copy(pill.summary)}</span>
                 </span>
               </button>
             </li>

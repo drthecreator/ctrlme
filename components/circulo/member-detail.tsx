@@ -16,11 +16,13 @@ import {
   type CircleMember,
 } from '@/lib/circle'
 import { useIdentity } from '@/lib/identity-store'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 import { cn } from '@/lib/utils'
 
 export function MemberDetail({ id }: { id: string }) {
   const router = useRouter()
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const [confirmingRemove, setConfirmingRemove] = useState(false)
   const member = state.circle.members.find((m) => m.id === id)
 
@@ -116,7 +118,7 @@ export function MemberDetail({ id }: { id: string }) {
       ) : (
         <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-6">
           <div className="space-y-5 lg:col-span-7">
-            <section className="surface mx-5 flex items-center gap-5 rounded-3xl p-5" aria-label="Puntuación">
+            <section className="surface mx-5 flex items-center gap-5 rounded-3xl p-5" aria-label={copy('Puntuación')}>
               <ScoreRing score={score} />
               <div>
                 <p className={cn('text-lg font-semibold', toneStyles[level.tone].text)}>{level.label}</p>
