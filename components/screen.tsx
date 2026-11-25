@@ -32,10 +32,10 @@ export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderPr
   const v3 = version === 'v3'
   const displayedTitle = v3 && title === 'Plan para subir'
     ? language === 'en' ? 'Improve your score' : 'Mejora tu puntuación'
-    : v3 && title === 'Guías rápidas'
+    : v3 && (title === 'Guías rápidas' || title === 'Aprende en 1 minuto' || title === 'Guías')
       ? language === 'en' ? 'Guides' : 'Guías'
       : title
-  const displayedSubtitle = v3 && title === 'Guías rápidas'
+  const displayedSubtitle = v3 && (title === 'Guías rápidas' || title === 'Aprende en 1 minuto' || title === 'Guías')
     ? language === 'en' ? 'Learn in 1 minute' : 'Aprende en 1 minuto'
     : v3 && title === 'Plan para subir'
       ? language === 'en' ? 'Actions ordered by their impact on your score.' : 'Acciones ordenadas por el impacto que tienen en tu puntuación.'

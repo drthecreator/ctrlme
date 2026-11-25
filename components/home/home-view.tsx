@@ -40,29 +40,42 @@ export function HomeView() {
     ? `Your score is ${total} out of 100, ${protectionLabel.toLowerCase()}. View your digital footprint`
     : `Tu puntuación es ${total} de 100, ${protectionLabel.toLowerCase()}. Ver tu huella digital`
 
+  const overviewTitle = isV3 ? t('Tu resumen', prototype.language) : 'Tu resumen'
+  const overviewSubtitle = isV3 ? t('Así está hoy tu identidad digital.', prototype.language) : 'Así está hoy tu identidad digital.'
+  const scannedRelative = formatRelative(state.scannedAt, Date.now())
+
   return (
     <Screen wide>
       <HomeHeader name={state.identity.name} email={state.identity.emails[0]?.address} />
-      {!isV3 ? <>
-        <h1 tabIndex={-1} className="px-5 pt-3 pb-2 text-lg font-semibold tracking-tight lg:hidden">Tu resumen</h1>
-        <div className="hidden px-5 pt-2 pb-5 lg:block">
-          <h1 tabIndex={-1} className="font-serif text-[2.75rem] leading-tight tracking-tight">Tu resumen</h1>
-          <p className="mt-1 text-base text-muted-foreground">Así está hoy tu identidad digital.</p>
-        </div>
-      </> : <h1 tabIndex={-1} className="sr-only">{t('Tu identidad digital', prototype.language)}</h1>}
+      <h1 tabIndex={-1} className="px-5 pt-3 pb-2 text-lg font-semibold tracking-tight lg:hidden">
+        {overviewTitle}
+      </h1>
+      <header className="hidden px-5 pt-2 pb-5 lg:block">
+        <h1 tabIndex={-1} className="font-serif text-[2.75rem] leading-tight tracking-tight">
+          {overviewTitle}
+        </h1>
+        <p className="mt-1 text-base text-muted-foreground">{overviewSubtitle}</p>
+      </header>
 
       <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-6">
       <div className="lg:col-span-7">
-      <p className="mx-5 mt-1 flex items-center gap-2 rounded-full bg-secondary/70 px-3 py-2 text-[0.8125rem] text-secondary-foreground">
+      <p
+        className={cn(
+          'mx-5 mt-1 flex items-center gap-2 bg-secondary/70 px-3 py-2 text-[0.8125rem] text-secondary-foreground',
+          isV3 ? 'flex-wrap rounded-2xl' : 'rounded-full',
+        )}
+      >
         <span className="relative flex size-2 shrink-0" aria-hidden="true">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-success/60 motion-reduce:hidden" />
           <span className="relative inline-flex size-2 rounded-full bg-success" />
         </span>
-        <span className="min-w-0 truncate">
+        <span className={cn('min-w-0', isV3 ? 'break-all' : 'truncate')}>
               {isV3 ? t('Vigilando', prototype.language) : 'Vigilando'} <strong className="font-semibold">{primaryEmail}</strong>
               {state.identity.emails.length > 1 ? isV3 && prototype.language === 'en' ? ` and ${state.identity.emails.length - 1} more` : ` y ${state.identity.emails.length - 1} más` : ''}
         </span>
-        <span className="ml-auto shrink-0 text-muted-foreground">{formatRelative(state.scannedAt, Date.now())}</span>
+        <span className="ml-auto shrink-0 text-muted-foreground">
+          {isV3 ? localize(scannedRelative, prototype.language) : scannedRelative}
+        </span>
       </p>
 
       <section aria-labelledby="score-title" className="px-5 pt-5">
@@ -84,12 +97,24 @@ export function HomeView() {
             <p className="text-center text-xs text-muted-foreground">
               {t('Cuanto más alta sea la puntuación, mejor protegida está tu identidad.', prototype.language)}
             </p>
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <Link href="/huella" className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'min-w-0 px-2 text-center text-xs sm:text-sm')}>
-                {isV3 ? t('Ver mi huella digital', prototype.language) : 'Ver mi huella digital'}
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(8.75rem,1fr))] gap-2 pt-1">
+              <Link
+                href="/huella"
+                className={cn(
+                  buttonVariants({ variant: 'outline', size: 'touch-sm' }),
+                  'h-auto min-h-12 min-w-0 px-3 py-2.5 text-center leading-snug whitespace-normal text-[0.8125rem] sm:text-sm',
+                )}
+              >
+                {t('Ver mi huella digital', prototype.language)}
               </Link>
-              <Link href="/plan" className={cn(buttonVariants({ variant: 'default', size: 'touch-sm' }), 'min-w-0 px-2 text-center text-xs sm:text-sm')}>
-                {isV3 ? t('Mejora tu puntuación', prototype.language) : 'Mejora tu puntuación'}
+              <Link
+                href="/plan"
+                className={cn(
+                  buttonVariants({ variant: 'default', size: 'touch-sm' }),
+                  'h-auto min-h-12 min-w-0 px-3 py-2.5 text-center leading-snug whitespace-normal text-[0.8125rem] sm:text-sm',
+                )}
+              >
+                {t('Mejora tu puntuación', prototype.language)}
               </Link>
             </div>
           </div>
@@ -214,7 +239,7 @@ function CircleCard() {
           <span className="block text-sm text-muted-foreground">{circleDescription}</span>
         </span>
         {requests > 0 ? (
-          <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-bold text-white">
+          <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-bold text-destructive-foreground">
             {requests}
             <span className="sr-only"> {isV3 ? t(requests === 1 ? 'solicitud nueva' : 'solicitudes nuevas', prototype.language) : requests === 1 ? 'solicitud nueva' : 'solicitudes nuevas'}</span>
           </span>
@@ -275,7 +300,7 @@ function ActionCard({ state }: { state: IdentityState }) {
   const Icon = content.icon
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-primary p-5 text-primary-foreground">
+    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-brand-surface p-5 text-brand-surface-foreground">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-16 -right-12 size-44 rounded-full bg-accent/25 blur-2xl"
@@ -290,7 +315,7 @@ function ActionCard({ state }: { state: IdentityState }) {
           : isV3 && hasOpenBreach(state) ? `${t('Filtración en', prototype.language)} ${BREACH.service}`
             : isV3 && !plan.length ? t('Tu identidad está protegida', prototype.language) : isV3 ? localize(content.title, prototype.language) : content.title}
       </h2>
-      <p className="mt-1 text-[0.9375rem] leading-relaxed text-primary-foreground/75">
+      <p className="mt-1 text-[0.9375rem] leading-relaxed text-brand-surface-foreground/85">
         {isV3 && suspicious.length > 0 ? t('Dispositivos que no reconocemos siguen conectados a tu cuenta de Google.', prototype.language)
           : isV3 && hasOpenBreach(state) ? t('Tu contraseña antigua aparece en una base de datos filtrada.', prototype.language)
             : isV3 && !plan.length ? t('Seguiremos vigilando y te avisaremos si detectamos algo nuevo.', prototype.language) : isV3 ? localize(content.body, prototype.language) : content.body}

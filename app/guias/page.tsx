@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Guías rápidas · Ctrl+Me' }
 export default function GuiasPage() {
   return (
     <Screen wide>
-      <ScreenHeader title="Guías" subtitle="Aprende en 1 minuto" />
+      <ScreenHeader title="Aprende en 1 minuto" />
       <GuidesLibrary />
     </Screen>
   )

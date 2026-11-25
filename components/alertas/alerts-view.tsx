@@ -25,7 +25,7 @@ export function AlertsView() {
         <span className="min-w-0 flex-1">
           <span className="block text-xs text-muted-foreground">
             {copy('Vigilando')} {emails.length} {copy(emails.length === 1 ? 'correo' : 'correos')} · {copy('revisado')}{' '}
-            {formatRelative(state.scannedAt, Date.now())}
+            {copy(formatRelative(state.scannedAt, Date.now()))}
           </span>
           <span className="block truncate text-[0.9375rem] font-medium">{emails.map((e) => e.address).join(', ')}</span>
         </span>
@@ -35,7 +35,7 @@ export function AlertsView() {
 
       {state.breachResolved ? (
         <section className="mx-5 flex items-start gap-3 rounded-3xl border border-success/20 bg-success-soft p-5">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-success text-white">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-success text-success-foreground">
             <ShieldCheck className="size-5" aria-hidden="true" />
           </span>
           <div>
@@ -51,7 +51,7 @@ export function AlertsView() {
           className="mx-5 rounded-3xl border border-destructive/20 bg-destructive-soft p-5"
         >
           <div className="flex items-start gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-destructive text-white">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-destructive text-destructive-foreground">
               <TriangleAlert className="size-5" aria-hidden="true" />
             </span>
             <div>
@@ -70,21 +70,21 @@ export function AlertsView() {
             </div>
             <div>
               <dt className={isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}>{copy('Detectada')}</dt>
-              <dd className="mt-0.5 font-semibold">{BREACH.detectedOn}</dd>
+              <dd className="mt-0.5 font-semibold">{copy(BREACH.detectedOn)}</dd>
             </div>
             <div className="col-span-2">
               <dt className={isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}>{copy('Datos expuestos')}</dt>
               <dd className="mt-1.5 flex flex-wrap gap-1.5">
                 {BREACH.data.map((item) => (
-                  <span key={item} className="rounded-full bg-card px-2.5 py-1 text-xs font-semibold">
-                    {item}
+                  <span key={item} className="rounded-full bg-card px-2.5 py-1 text-xs font-semibold text-card-foreground">
+                    {copy(item)}
                   </span>
                 ))}
               </dd>
             </div>
           </dl>
-          <p className={`mt-3 text-xs ${isV3 ? 'text-destructive' : 'text-muted-foreground'}`}>
-            {copy('Afectó a')} {BREACH.affected}. {copy('Correo')}: {emails[0]?.address}
+          <p className={`mt-3 text-xs ${isV3 ? 'font-medium text-destructive' : 'text-muted-foreground'}`}>
+            {copy('Afectó a')} {copy(BREACH.affected)}. {copy('Correo')}: {emails[0]?.address}
           </p>
         </section>
       )}

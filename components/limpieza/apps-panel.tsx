@@ -6,7 +6,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { AllDone, DoneBar, PanelIntro } from '@/components/limpieza/cleanup-parts'
 import { APP_PERMISSIONS, CONNECTED_APPS, getPendingApps, useIdentity } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
-import { usePrototypeCopy } from '@/lib/prototype-context'
+import { useIsV3, usePrototypeCopy } from '@/lib/prototype-context'
 
 const manageUrl: Record<string, string> = {
   Google: 'https://myaccount.google.com/connections',
@@ -17,6 +17,7 @@ const riskyPermissions = new Set(['maps', 'torch', 'weather'])
 
 export function AppsPanel() {
   const { state, update } = useIdentity()
+  const isV3 = useIsV3()
   const copy = usePrototypeCopy()
   const pending = getPendingApps(state)
 
@@ -55,18 +56,23 @@ export function AppsPanel() {
               {removed ? (
                 <DoneBar label="Marcada como desconectada" onUndo={() => setRemoved(app.id, false)} />
               ) : (
-                <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <a
                     href={manageUrl[app.via]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={buttonVariants({ variant: 'outline', size: 'touch-sm' })}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'h-auto min-h-11 py-2 text-center whitespace-normal')}
                   >
                     {copy('Abrir ajustes')}
                     <ExternalLink aria-hidden="true" />
                     <span className="sr-only"> {copy('de')} {app.via} ({copy('pestaña nueva')})</span>
                   </a>
-                  <Button variant="destructive" size="touch-sm" onClick={() => setRemoved(app.id, true)}>
+                  <Button
+                    variant="destructive"
+                    size="touch-sm"
+                    className="h-auto min-h-11 py-2 text-center whitespace-normal"
+                    onClick={() => setRemoved(app.id, true)}
+                  >
                     {copy('Ya la desconecté')}
                     <span className="sr-only">: {app.name}</span>
                   </Button>
@@ -101,7 +107,7 @@ export function AppsPanel() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[0.9375rem] font-semibold">
-                    {item.app} <span className="font-normal text-muted-foreground">· {item.permission}</span>
+                    {copy(item.app)} <span className="font-normal text-muted-foreground">· {copy(item.permission)}</span>
                   </p>
                   <p className="text-sm text-muted-foreground">{copy(item.access)}</p>
                 </div>
@@ -113,7 +119,7 @@ export function AppsPanel() {
 
         <Link
           href="/guias#permisos"
-          className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'mt-3 w-full')}
+          className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'mt-3 h-auto min-h-11 w-full py-2 text-center whitespace-normal')}
         >
           <BookOpen aria-hidden="true" />
           {copy('Guía: cómo revisar permisos')}
@@ -126,8 +132,8 @@ export function AppsPanel() {
           />
         ) : (
           <Button
-            className="mt-2 w-full"
-            variant="ghost"
+            className="mt-2 h-auto min-h-11 w-full py-2 text-center whitespace-normal"
+            variant={isV3 ? 'outline' : 'ghost'}
             size="touch-sm"
             onClick={() => update((s) => ({ ...s, permissionsReviewed: true }))}
           >

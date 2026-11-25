@@ -265,7 +265,7 @@ export function ProfileSettings() {
       >
         {recipients.length === 0 ? (
           <p className="p-4 text-sm leading-relaxed text-muted-foreground">
-            Nadie recibe tus avisos. Puedes dar permiso a alguien de confianza desde{' '}
+            {copy('Nadie recibe tus avisos. Puedes dar permiso a alguien de confianza desde')}{' '}
             <Link href="/circulo" className="font-semibold text-primary underline-offset-4 hover:underline">
               {copy('Mi círculo')}
             </Link>
@@ -286,7 +286,7 @@ export function ProfileSettings() {
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-[0.9375rem] font-semibold">{person.name}</p>
-                    <p className="truncate text-sm text-muted-foreground">{person.relation}</p>
+                    <p className="truncate text-sm text-muted-foreground">{copy(person.relation)}</p>
                   </div>
                 </div>
                 <Row
@@ -297,7 +297,7 @@ export function ProfileSettings() {
                     <Switch
                       checked={prefs.breaches}
                       onCheckedChange={(checked) => setPref(person.id, { breaches: checked })}
-                      aria-label={`Avisos de filtraciones para ${person.name}`}
+                      aria-label={copy(`Avisos de filtraciones para ${person.name}`)}
                     />
                   }
                 />
@@ -316,13 +316,18 @@ export function ProfileSettings() {
         </p>
         {confirmDelete ? (
           isV3 ? (
-            <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4">
-              <section role="alertdialog" aria-modal="true" aria-labelledby={`${id}-delete-title`} aria-describedby={`${id}-delete-description`} className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+            <div
+              className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) setConfirmDelete(false)
+              }}
+            >
+              <section role="alertdialog" aria-modal="true" aria-labelledby={`${id}-delete-title`} aria-describedby={`${id}-delete-description`} className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
                 <h2 id={`${id}-delete-title`} className="text-xl font-semibold">{copy('Borrar todos tus datos')}</h2>
                 <p id={`${id}-delete-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">{copy('Esta acción no se puede deshacer. Se eliminarán tu perfil, preferencias y acciones guardadas.')}</p>
                 <div className="mt-6 flex justify-end gap-2">
-                  <Button variant="outline" size="touch-sm" autoFocus onClick={() => setConfirmDelete(false)}>{copy('Cancelar')}</Button>
-<Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>{copy('Sí, borrar todo')}</Button>
+                  <Button id="delete-account-cancel" variant="outline" size="touch-sm" autoFocus onClick={() => setConfirmDelete(false)}>{copy('Cancelar')}</Button>
+                  <Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>{copy('Sí, borrar todo')}</Button>
                 </div>
               </section>
             </div>

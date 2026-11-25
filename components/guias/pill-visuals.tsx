@@ -72,3 +72,9 @@ export const categoryTone: Record<PillCategory, string> = {
   'ia-fraude': 'bg-accent text-accent-foreground',
   privacidad: 'bg-secondary text-primary',
 }
+
+export const categoryToneV3: Record<PillCategory, string> = {
+  cuentas: 'bg-brand-surface text-brand-surface-foreground',
+  'ia-fraude': 'bg-[#155e4b] text-white',
+  privacidad: 'bg-[#364156] text-white',
+}

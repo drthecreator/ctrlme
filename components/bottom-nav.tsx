@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { hasOpenBreach, useIdentity } from '@/lib/identity-store'
 import { localize, usePrototype } from '@/lib/prototype-context'
+import { PrototypeShortcutsButton } from '@/components/prototype-controls'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -81,7 +82,7 @@ export function BottomNav() {
                 >
                   <Icon className="size-5" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
                   {badge ? (
-                    <span className="absolute top-0.5 right-2.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] leading-none font-bold text-white ring-2 ring-card">
+                    <span className="absolute top-0.5 right-2.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] leading-none font-bold text-destructive-foreground ring-2 ring-card">
                       {badge}
                       <span className="sr-only"> {copy('alerta nueva')}</span>
                     </span>
@@ -110,20 +111,20 @@ function SideLink({ href, label, icon: Icon, matches, badge, pathname }: NavItem
           'group relative flex min-h-12 items-center gap-3 rounded-2xl px-3 text-[0.9375rem] transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none',
           active
             ? 'bg-accent font-semibold text-accent-foreground'
-            : 'font-medium text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground',
+            : 'font-medium text-brand-surface-foreground/80 hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground',
         )}
       >
         <span
           className={cn(
             'flex size-8 shrink-0 items-center justify-center rounded-xl transition-colors',
-            active ? 'bg-accent-foreground/10' : 'bg-primary-foreground/8 group-hover:bg-primary-foreground/12',
+            active ? 'bg-accent-foreground/10' : 'bg-brand-surface-foreground/10 group-hover:bg-brand-surface-foreground/14',
           )}
         >
           <Icon className="size-[1.125rem]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
         </span>
         {label}
         {badge ? (
-          <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] leading-none font-bold text-white">
+          <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] leading-none font-bold text-destructive-foreground">
             {badge}
             <span className="sr-only"> {copy('pendiente')}</span>
           </span>
@@ -162,11 +163,11 @@ export function SideNav() {
   const profileActive = isActive(pathname, ['/perfil'])
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto bg-primary px-4 py-6 text-primary-foreground lg:flex xl:w-72">
+    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-transparent bg-brand-surface px-4 py-6 text-brand-surface-foreground lg:flex xl:w-72 dark:border-border">
       <Link
         href="/"
         className="flex items-center gap-3 rounded-2xl px-2 py-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-          aria-label={copy('Ctrl+Me, ir a Principal')}
+        aria-label={copy('Ctrl+Me, ir a Principal')}
       >
         <span className="flex size-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
           <Fingerprint className="size-5" aria-hidden="true" />
@@ -176,9 +177,9 @@ export function SideNav() {
         </span>
       </Link>
 
-        <nav aria-label={copy('Navegación principal')} className="mt-9 flex flex-col gap-6">
+      <nav aria-label={copy('Navegación principal')} className="mt-9 flex flex-col gap-6">
         <div>
-          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
+          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-brand-surface-foreground/75 uppercase">
             {copy('Tu identidad')}
           </p>
           <ul className="flex flex-col gap-1">
@@ -188,7 +189,7 @@ export function SideNav() {
           </ul>
         </div>
         <div>
-          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-primary-foreground/75 uppercase">
+          <p className="px-3 pb-2 text-xs font-semibold tracking-widest text-brand-surface-foreground/75 uppercase">
             {copy('Gente de confianza')}
           </p>
           <ul className="flex flex-col gap-1">
@@ -206,7 +207,7 @@ export function SideNav() {
           'group mt-8 flex items-center gap-3 rounded-3xl border p-3.5 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none',
           assistantActive
             ? 'border-accent bg-accent text-accent-foreground'
-            : 'border-primary-foreground/15 bg-primary-foreground/6 hover:bg-primary-foreground/12',
+            : 'border-brand-surface-foreground/20 bg-brand-surface-foreground/8 hover:bg-brand-surface-foreground/14',
         )}
       >
         <span
@@ -219,18 +220,19 @@ export function SideNav() {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block font-serif text-xl leading-tight">{copy('Asistente')}</span>
-          <span className={cn('block text-xs', assistantActive ? 'opacity-75' : 'text-primary-foreground/60')}>
+          <span className={cn('block text-xs', assistantActive ? 'opacity-80' : 'text-brand-surface-foreground/75')}>
             {copy('Escribe o habla con él')}
           </span>
         </span>
         <ChevronRight
-          className="size-4 shrink-0 opacity-50 transition-transform group-hover:translate-x-0.5"
+          className="size-4 shrink-0 opacity-70 transition-transform group-hover:translate-x-0.5"
           aria-hidden="true"
         />
       </Link>
 
       <div className="mt-auto flex flex-col gap-3 pt-8">
-        <p className="flex items-center gap-2 px-2 text-xs leading-snug text-primary-foreground/55">
+        <PrototypeShortcutsButton />
+        <p className="flex items-center gap-2 px-2 text-xs leading-snug text-brand-surface-foreground/75">
           <ShieldCheck className="size-4 shrink-0 text-accent" aria-hidden="true" />
           {copy('Tus datos están cifrados y son solo tuyos.')}
         </p>
@@ -240,8 +242,8 @@ export function SideNav() {
           className={cn(
             'flex items-center gap-3 rounded-2xl border p-3 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none',
             profileActive
-              ? 'border-accent/60 bg-primary-foreground/12'
-              : 'border-primary-foreground/15 hover:bg-primary-foreground/10',
+              ? 'border-accent/60 bg-brand-surface-foreground/14'
+              : 'border-brand-surface-foreground/20 hover:bg-brand-surface-foreground/10',
           )}
         >
           <span
@@ -251,8 +253,8 @@ export function SideNav() {
             {(name[0] ?? email?.[0] ?? '?').toUpperCase()}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-[0.9375rem] font-semibold">{name || 'Mi perfil'}</span>
-            <span className="block truncate text-xs text-primary-foreground/60">{email}</span>
+            <span className="block truncate text-[0.9375rem] font-semibold">{name || copy('Mi perfil')}</span>
+            <span className="block truncate text-xs text-brand-surface-foreground/75">{email}</span>
           </span>
         </Link>
       </div>

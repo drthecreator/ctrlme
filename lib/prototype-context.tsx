@@ -9,6 +9,10 @@ type Contrast = 'normal' | 'high'
 type PrototypeSettings = { version: PrototypeVersion; language: Language; theme: Theme; contrast: Contrast; fontScale: 100 | 125 | 150 }
 type PrototypeContextValue = PrototypeSettings & {
   ready: boolean
+  showPicker: boolean
+  setShowPicker: (open: boolean) => void
+  showShortcuts: boolean
+  setShowShortcuts: (open: boolean) => void
   setVersion: (version: PrototypeVersion) => void
   setLanguage: (language: Language) => void
   setTheme: (theme: Theme) => void
@@ -22,6 +26,8 @@ const PrototypeContext = createContext<PrototypeContextValue | null>(null)
 export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState(defaults)
   const [ready, setReady] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
 
   useEffect(() => {
     try {
@@ -29,9 +35,12 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<PrototypeSettings>
         setSettings({ ...defaults, ...parsed })
+      } else {
+        setShowPicker(true)
       }
     } catch {
       localStorage.removeItem('ctrlme-prototype-settings-v3')
+      setShowPicker(true)
     } finally {
       setReady(true)
     }
@@ -43,7 +52,7 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.version = settings.version
     document.documentElement.dataset.theme = settings.theme
     document.documentElement.dataset.contrast = settings.contrast
-    document.documentElement.lang = settings.language
+    document.documentElement.lang = settings.version === 'v3' ? settings.language : 'es'
     document.documentElement.style.setProperty('--prototype-font-scale', `${settings.fontScale / 100}`)
   }, [ready, settings])
 
@@ -54,12 +63,16 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<PrototypeContextValue>(() => ({
     ...settings,
     ready,
+    showPicker,
+    setShowPicker,
+    showShortcuts,
+    setShowShortcuts,
     setVersion: (version) => change('version', version),
     setLanguage: (language) => change('language', language),
     setTheme: (theme) => change('theme', theme),
     setContrast: (contrast) => change('contrast', contrast),
     setFontScale: (fontScale) => change('fontScale', fontScale),
-  }), [settings, ready, change])
+  }), [settings, ready, showPicker, showShortcuts, change])
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>
 }
@@ -475,22 +488,168 @@ const englishText: Record<string, string> = {
   'Contraseña de Google actualizada': 'Google password updated',
   'Cerrar': 'Close', 'Fuentes analizadas': 'Sources analyzed', 'Volver a analizar': 'Scan again',
   'Puntuación': 'Score', 'Resumen': 'Overview', 'El asistente está escribiendo': 'The assistant is typing',
+  'Deshacer': 'Undo',
+  'Correos de pedidos': 'Order emails',
+  'Registro con tu correo': 'Signed up with your email',
+  'Inicio de sesión con Google': 'Signed in with Google',
+  'Nombre, correo y foto': 'Name, email, and photo',
+  'Nombre y correo': 'Name and email',
+  'Nombre, correo y amistades': 'Name, email, and friends',
+  'Linterna Plus': 'Flashlight Plus',
+  'El Tiempo': 'Weather',
+  'Micrófono y cámara': 'Microphone and camera',
+  'Siempre, también en segundo plano': 'Always, including in the background',
+  'Una linterna no lo necesita': 'A flashlight does not need this',
+  'Solo mientras la usas': 'Only while in use',
+  '12 oct 2026': 'Oct 12, 2026',
+  '700 millones de cuentas': '700 million accounts',
+  'Contraseña antigua': 'Old password',
+  'Nombre y cargo': 'Name and job title',
+  'Comprueba si sigues usando esa clave': 'Check if you still use that password',
+  'Revisa si la usas en otras cuentas.': 'Check whether you reuse it on other accounts.',
+  'Cambia la clave en las cuentas donde se repita': 'Change the password wherever it is reused',
+  'Empieza por tu correo y tu banco.': 'Start with your email and bank.',
+  'Abrir web oficial': 'Open official website',
+  'Así nadie entra aunque tenga tu clave.': 'That way nobody can get in even with your password.',
+  'Ver guía rápida': 'View quick guide',
+  'pasos completados': 'steps completed',
+  'Marcar como hecho': 'Mark as done',
+  '(se abre en una pestaña nueva)': '(opens in a new tab)',
+  'Nivel bajo': 'Low level',
+  'Nivel medio': 'Moderate level',
+  'Nivel alto': 'High level',
+  'Seguridad de accesos': 'Access security',
+  'Exposición pública': 'Public exposure',
+  'Hábitos y prevención': 'Habits and prevention',
+  'Avisos de filtraciones': 'Breach alerts',
+  'Revisa tus publicaciones antiguas': 'Review your older posts',
+  'Haz privado tu perfil de Instagram': 'Make your Instagram profile private',
+  'Deja de repetir contraseñas': 'Stop reusing passwords',
+  'Usa un gestor de contraseñas': 'Use a password manager',
+  'Revisa los permisos de ubicación': 'Review location permissions',
+  'Activa las actualizaciones automáticas': 'Turn on automatic updates',
+  'Actualiza tu correo y teléfono de recuperación': 'Update your recovery email and phone',
+  'Verifica los enlaces antes de pulsarlos': 'Verify links before tapping them',
+  'Deja de enviar tu DNI por chat': 'Stop sending your ID over chat',
+  'Evita las redes Wi-Fi abiertas': 'Avoid open Wi-Fi networks',
+  'Quita tu tarjeta de las tiendas online': 'Remove your saved card from online stores',
+  'No compartas datos personales con chatbots de IA': 'Do not share personal data with AI chatbots',
+  'Evita subir fotos personales a herramientas de IA': 'Avoid uploading personal photos to AI tools',
+  'Reduce los accesos con Google o Facebook': 'Reduce sign-ins with Google or Facebook',
+  'Publica fotos sin ubicación': 'Post photos without location tags',
+  'Quita datos reales de tus perfiles públicos': 'Remove personal details from public profiles',
+  'Bloquea el móvil con huella o Face ID': 'Lock your phone with fingerprint or Face ID',
+  'Activa la copia de seguridad del móvil': 'Turn on phone backup',
+  'puntos': 'points',
+  'Por ejemplo, Carmen': 'For example, Carmen',
+  'Esta persona ya no está en tu círculo.': 'This person is no longer in your circle.',
+  'Cancelar solicitud': 'Cancel request',
+  'El botón de simulación solo existe en este prototipo.': 'The simulation button only exists in this prototype.',
+  'Ha llegado al máximo que podemos medir.': 'Reached the highest score we can measure.',
+  'Cambiar su contraseña ahora': 'Change their password now',
+  'Qué se puede mejorar': 'What can be improved',
+  'Actividad': 'Activity',
+  'Dejar de gestionar': 'Stop managing',
+  'Cerrar una sesión desconocida': 'Sign out of an unrecognized session',
+  'Hay un dispositivo que no reconoce conectado a su cuenta de Google.': 'An unrecognized device is connected to their Google account.',
+  'Borrar una cuenta que ya no usa': 'Delete an unused account',
+  'Un foro antiguo sigue guardando su correo y su fecha de nacimiento.': 'An old forum still stores their email and date of birth.',
+  'Su correo principal se puede abrir solo con la contraseña.': 'Their main email can still be opened with only a password.',
+  'Activar la verificación en dos pasos': 'Turn on two-step verification',
+  'Gmail para Android': 'Gmail for Android',
+  'App Ctrl+Me': 'Ctrl+Me App',
+  'Poner su perfil de Instagram en privado': 'Make their Instagram profile private',
+  'Ahora mismo cualquiera puede ver sus fotos y dónde las hizo.': 'Right now anyone can see their photos and where they were taken.',
+  'Cambiar una contraseña repetida': 'Change a reused password',
+  'Usa la misma clave en su correo y en una tienda online.': 'They use the same password for their email and an online store.',
+  'Carmen te dio permiso para hacer limpieza en su nombre': 'Carmen gave you permission to clean up on her behalf',
+  'Detectamos una filtración de Canva en su correo': 'We detected a Canva breach involving their email',
+  'Escuchando…': 'Listening…',
+  'Pensando…': 'Thinking…',
+  'Respondiendo en voz alta…': 'Speaking out loud…',
+  'Habla con normalidad': 'Speak naturally',
+  'Detener respuesta': 'Stop response',
+  'Cancelar mensaje de voz': 'Cancel voice message',
+  'Guía de contraseñas': 'Password guide',
+  'Combinamos tus respuestas con el análisis de tu correo para calcular la puntuación.': 'We combine your answers with your email scan to calculate your score.',
+  'El asistente necesita conocer tus cuentas para revisar sus sesiones.': 'The assistant needs access to your accounts to review open sessions.',
+  'datos personales': 'personal data',
+  'redes sociales': 'social networks',
+  'permisos y comportamiento': 'permissions and behavior',
+  'información profesional': 'professional information',
+}
+
+const v3SpanishOverrides: Record<string, string> = {
+  'Plan para subir': 'Mejora tu puntuación',
+  'Guías rápidas': 'Guías',
 }
 
 export function localize(text: string, language: Language) {
-  if (language !== 'en') return text
-  const exact = englishText[text]
+  if (language !== 'en') return v3SpanishOverrides[text] ?? text
+  const exact = englishText[text] ?? (messages.en as Record<string, string>)[text]
   if (exact) return exact
   const closedSessions = text.match(/^(\d+) (sesión cerrada|sesiones cerradas)$/)
   if (closedSessions) return `${closedSessions[1]} session${closedSessions[1] === '1' ? '' : 's'} closed`
   const trustedDevices = text.match(/^(\d+) (dispositivo marcado|dispositivos marcados) como tuyo$/)
   if (trustedDevices) return `${trustedDevices[1]} device${trustedDevices[1] === '1' ? '' : 's'} marked as yours`
-  const relative = text.match(/^hace (\d+) (min|h|días)$/)
-  if (relative) return `${relative[1]} ${relative[2] === 'min' ? 'min' : relative[2] === 'h' ? 'hr' : 'days'} ago`
+  const relative = text.match(/^hace (\d+) (min|h|día|días|mes|meses|año|años)$/)
+  if (relative) {
+    const unitMap: Record<string, string> = {
+      min: 'min',
+      h: 'hr',
+      día: 'day',
+      días: 'days',
+      mes: 'month',
+      meses: 'months',
+      año: 'year',
+      años: 'years',
+    }
+    return `${relative[1]} ${unitMap[relative[2]] ?? relative[2]} ago`
+  }
   if (text === 'hace un momento') return 'Just now'
   if (text === 'un momento') return 'a moment ago'
   if (text === 'ayer') return 'yesterday'
   if (text === 'nunca') return 'Never'
+  const breachStepsHint = text.match(/^Marca los (\d+) pasos para cerrar la alerta\.$/)
+  if (breachStepsHint) return `Complete all ${breachStepsHint[1]} steps to dismiss the alert.`
+  const tellByEmail = text.match(/^Se lo contamos a (.+) por correo$/)
+  if (tellByEmail) return `We notify ${tellByEmail[1]} by email`
+  const alertsForPerson = text.match(/^Avisos de filtraciones para (.+)$/)
+  if (alertsForPerson) return `Breach alerts for ${alertsForPerson[1]}`
+  const waitingApproval = text.match(/^Esperando la aprobación de (.+)$/)
+  if (waitingApproval) return `Waiting for ${waitingApproval[1]}’s approval`
+  const requestSentTo = text.match(/^Hemos enviado la solicitud a (.+)\. Hasta que la acepte no podrás ver nada suyo\.$/)
+  if (requestSentTo) return `We sent the request to ${requestSentTo[1]}. Until they accept, you will not be able to see any of their data.`
+  const simulateAccept = text.match(/^Simular que (.+) acepta$/)
+  if (simulateAccept) return `Simulate ${simulateAccept[1]} accepting`
+  const couldReach = text.match(/^Podría llegar a (\d+) si resuelves lo pendiente\.$/)
+  if (couldReach) return `Could reach ${couldReach[1]} if you resolve pending items.`
+  const breachResolvedMember = text.match(/^Filtración de (.+) resuelta$/)
+  if (breachResolvedMember) return `${breachResolvedMember[1]} breach resolved`
+  const breachBodyMember = text.match(/^El correo de (.+) apareció en esta filtración\. Hay que cambiar su contraseña de (.+) y de cualquier sitio donde la repita\.$/)
+  if (breachBodyMember) return `${breachBodyMember[1]}’s email appeared in this breach. Change their ${breachBodyMember[2]} password and any other account where it is reused.`
+  const noActPerm = text.match(/^Avísale: no tienes permiso para actuar por (.+)\.$/)
+  if (noActPerm) return `Let them know: you do not have permission to act for ${noActPerm[1]}.`
+  const doFor = text.match(/^Hacerlo por (.+)$/)
+  if (doFor) return `Do it for ${doFor[1]}`
+  const notGivenPerm = text.match(/^(.+) no te ha dado permiso para actuar por ella o él\.$/)
+  if (notGivenPerm) return `${notGivenPerm[1]} has not given you permission to act on their behalf.`
+  const whatAllows = text.match(/^Lo que (.+) te permite$/)
+  if (whatAllows) return `What ${whatAllows[1]} allows you to do`
+  const neverSeeMember = text.match(/^Nunca ves sus contraseñas ni sus mensajes\. (.+) puede retirar el permiso cuando quiera\.$/)
+  if (neverSeeMember) return `You never see their passwords or messages. ${neverSeeMember[1]} can revoke access at any time.`
+  const stopManagingDesc = text.match(/^Dejarás de ver y gestionar la identidad de (.+)\. Sus datos no se borran\.$/)
+  if (stopManagingDesc) return `You will stop seeing and managing ${stopManagingDesc[1]}’s identity. Their data will not be deleted.`
+  const stopManagingBtn = text.match(/^Dejar de gestionar a (.+)$/)
+  if (stopManagingBtn) return `Stop managing ${stopManagingBtn[1]}`
+  const sentRequestTo = text.match(/^Enviaste la solicitud a (.+)$/)
+  if (sentRequestTo) return `You sent the request to ${sentRequestTo[1]}`
+  const acceptedRequest = text.match(/^(.+) aceptó tu solicitud$/)
+  if (acceptedRequest) return `${acceptedRequest[1]} accepted your request`
+  const didFor = text.match(/^Hiciste por ([^:]+): (.+)$/)
+  if (didFor) return `Completed for ${didFor[1]}: ${didFor[2]}`
+  const changedPassMember = text.match(/^Cambiaste la contraseña de (.+) tras la filtración de (.+)$/)
+  if (changedPassMember) return `Changed ${changedPassMember[1]}’s password after the ${changedPassMember[2]} breach`
   const oldPosts = text.match(/^Unas (\d+) publicaciones de hace más de 2 años$/)
   if (oldPosts) return `About ${oldPosts[1]} posts from over 2 years ago`
   const sessions = text.match(/^Revisa (\d+) (sesión sospechosa|sesiones sospechosas)$/)

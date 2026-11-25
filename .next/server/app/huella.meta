@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/huella/layout,_N_T_/huella/page,_N_T_/huella"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/huella/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/94743fabbd49f454be6eb150d6c322a94f5375b8d71fcb8508c38012b42cd80d/$/huella",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/huella/page"
+    },
+    "isFallback": false
+  }
+}

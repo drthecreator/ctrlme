@@ -32,7 +32,7 @@ import {
   type SessionKind,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
-import { usePrototypeCopy } from '@/lib/prototype-context'
+import { useIsV3, usePrototypeCopy } from '@/lib/prototype-context'
 
 export type Tab = 'sesiones' | 'inactivas' | 'perfiles' | 'apps'
 
@@ -71,13 +71,13 @@ export function CleanupTabs({ defaultTab }: { defaultTab: Tab }) {
             aria-controls={`panel-${t.id}`}
             onClick={() => setTab(t.id)}
             className={cn(
-              'flex min-h-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-medium text-muted-foreground transition-all',
+              'flex h-auto min-h-11 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-center text-sm leading-tight font-medium text-muted-foreground transition-all',
               tab === t.id && 'bg-card font-semibold text-foreground shadow-sm',
             )}
           >
             {copy(t.label)}
             {t.count > 0 ? (
-              <span className="flex size-5 items-center justify-center rounded-full bg-warning text-[0.6875rem] font-bold text-white tabular-nums">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-warning text-[0.6875rem] font-bold text-warning-foreground tabular-nums">
                 {t.count}
               </span>
             ) : null}
@@ -97,6 +97,7 @@ export function CleanupTabs({ defaultTab }: { defaultTab: Tab }) {
 
 function SessionsPanel() {
   const { state, update } = useIdentity()
+  const isV3 = useIsV3()
   const copy = usePrototypeCopy()
   const suspicious = getSuspiciousSessions(state)
 
@@ -130,11 +131,11 @@ function SessionsPanel() {
       {suspicious.length > 0 ? (
         <Link
           href="/asistente/sesiones"
-          className="mb-3 flex min-h-14 items-center gap-3 rounded-2xl bg-primary px-4 py-3 text-primary-foreground transition-transform active:scale-[0.99]"
+          className="mb-3 flex min-h-14 items-center gap-3 rounded-2xl border border-border/60 bg-brand-surface px-4 py-3 text-brand-surface-foreground transition-transform active:scale-[0.99]"
         >
           <Sparkles className="size-5 shrink-0 text-accent" aria-hidden="true" />
           <span className="flex-1 text-[0.9375rem] font-semibold">{copy('Revisar todo con el asistente')}</span>
-          <span className="text-sm text-primary-foreground/70">{suspicious.length}</span>
+          <span className="text-sm text-brand-surface-foreground/80">{suspicious.length}</span>
         </Link>
       ) : null}
 
@@ -172,10 +173,11 @@ function SessionsPanel() {
               </div>
 
               {isSuspicious ? (
-                <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <Button
                     variant="outline"
                     size="touch-sm"
+                    className="h-auto min-h-11 py-2 text-center whitespace-normal"
                     onClick={() => update((s) => ({ ...s, sessionStatus: { ...s.sessionStatus, [session.id]: 'trusted' } }))}
                   >
                     {copy('Es mío')}
@@ -183,6 +185,7 @@ function SessionsPanel() {
                   <Button
                     variant="destructive"
                     size="touch-sm"
+                    className="h-auto min-h-11 py-2 text-center whitespace-normal"
                     onClick={() => update((s) => ({ ...s, sessionStatus: { ...s.sessionStatus, [session.id]: 'closed' } }))}
                   >
                     <LogOut aria-hidden="true" />
@@ -200,7 +203,7 @@ function SessionsPanel() {
                     {copy(status === 'closed' ? 'Sesión cerrada' : 'Marcado como tuyo')}
                   </p>
                   <Button
-                    variant="ghost"
+                    variant={isV3 ? 'outline' : 'ghost'}
                     size="touch-sm"
                     onClick={() =>
                       update((s) => {
@@ -224,6 +227,7 @@ function SessionsPanel() {
 
 function AccountsPanel() {
   const { state, update } = useIdentity()
+  const isV3 = useIsV3()
   const copy = usePrototypeCopy()
   const pending = getPendingAccounts(state)
 
@@ -269,7 +273,7 @@ function AccountsPanel() {
                     {copy('Marcada como eliminada')}
                   </p>
                   <Button
-                    variant="ghost"
+                    variant={isV3 ? 'outline' : 'ghost'}
                     size="touch-sm"
                     onClick={() =>
                       update((s) => ({ ...s, deletedAccounts: s.deletedAccounts.filter((id) => id !== account.id) }))
@@ -279,12 +283,12 @@ function AccountsPanel() {
                   </Button>
                 </div>
               ) : (
-                <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <a
                     href={account.deleteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={buttonVariants({ variant: 'outline', size: 'touch-sm' })}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'h-auto min-h-11 py-2 text-center whitespace-normal')}
                   >
                     {copy('Abrir web')}
                     <ExternalLink aria-hidden="true" />
@@ -293,6 +297,7 @@ function AccountsPanel() {
                   <Button
                     variant="destructive"
                     size="touch-sm"
+                    className="h-auto min-h-11 py-2 text-center whitespace-normal"
                     onClick={() => update((s) => ({ ...s, deletedAccounts: [...s.deletedAccounts, account.id] }))}
                   >
                     <Trash2 aria-hidden="true" />

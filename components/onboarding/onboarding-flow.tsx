@@ -9,6 +9,7 @@ import {
   Brush,
   Check,
   ChevronLeft,
+  CircleAlert,
   Fingerprint,
   Loader2,
   Lock,
@@ -19,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { Switch } from '@/components/ui/switch'
+import { OnboardingLanguageSwitch, PrototypeVersionSwitch } from '@/components/prototype-controls'
 import { useIdentity, type Identity } from '@/lib/identity-store'
 import { useIsV3, usePrototype } from '@/lib/prototype-context'
 
@@ -128,10 +130,16 @@ function Welcome({ onStart }: { onStart: () => void }) {
     { icon: BookOpen, title: copyText('Aprende en 1 minuto', 'Learn in 1 minute', isV3, language), text: copyText('Guías visuales para protegerte.', 'Visual guides to help keep you safe.', isV3, language) },
   ]
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="mx-auto flex min-h-full w-full max-w-xl flex-col px-6 pt-[max(env(safe-area-inset-top),1.5rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)] md:justify-center md:py-12 lg:grid lg:max-w-6xl lg:grid-cols-2 lg:content-center lg:items-start lg:gap-x-20 lg:px-12">
+    <div className="flex h-full flex-col overflow-y-auto">
+      <div className="shrink-0 px-6 pt-[max(env(safe-area-inset-top),1rem)] lg:px-12">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2">
+          <PrototypeVersionSwitch />
+          <OnboardingLanguageSwitch className="ml-auto" />
+        </div>
+      </div>
+      <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-6 pt-4 pb-[max(env(safe-area-inset-bottom),1.5rem)] md:justify-center md:py-10 lg:grid lg:max-w-6xl lg:grid-cols-2 lg:content-center lg:items-start lg:gap-x-20 lg:px-12">
         <div className="lg:col-start-1 lg:row-start-1">
-          <div className="relative mt-6 flex size-16 items-center justify-center rounded-[1.25rem] bg-primary text-primary-foreground lg:mt-0 lg:size-20 lg:rounded-3xl">
+          <div className="relative mt-4 flex size-16 items-center justify-center rounded-[1.25rem] bg-brand-surface text-brand-surface-foreground lg:mt-0 lg:size-20 lg:rounded-3xl">
             <Fingerprint className="size-8 lg:size-10" aria-hidden="true" />
             <span
               aria-hidden="true"
@@ -183,7 +191,7 @@ function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
   const isV3 = useIsV3()
   return (
     <div className="sticky top-0 z-10 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-2 md:px-6 md:pt-6">
-      <div className="mx-auto flex w-full max-w-lg items-center gap-3 md:max-w-5xl">
+      <div className="mx-auto flex w-full max-w-lg flex-wrap items-center gap-2 md:max-w-5xl">
       <button
         type="button"
         onClick={onBack}
@@ -192,15 +200,18 @@ function StepHeader({ index, onBack }: { index: number; onBack: () => void }) {
         <ChevronLeft className="size-5" aria-hidden="true" />
         {copyText('Volver', 'Back', isV3, language)}
       </button>
-      <div className="ml-auto flex items-center gap-2 pr-2">
-        <span className="text-sm text-muted-foreground tabular-nums" aria-live="polite" aria-atomic="true">
-          {isV3 && language === 'en' ? `Step ${index} of 3` : `Paso ${index} de 3`}
+      <div className="ml-auto flex items-center gap-3 pr-1">
+        <span className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground tabular-nums" aria-live="polite" aria-atomic="true">
+            {isV3 && language === 'en' ? `Step ${index} of 3` : `Paso ${index} de 3`}
+          </span>
+          <span className="flex gap-1" aria-hidden="true">
+            {[1, 2, 3].map((n) => (
+              <span key={n} className={cn('h-1.5 w-5 rounded-full', n <= index ? 'bg-primary' : 'bg-muted')} />
+            ))}
+          </span>
         </span>
-        <span className="flex gap-1" aria-hidden="true">
-          {[1, 2, 3].map((n) => (
-            <span key={n} className={cn('h-1.5 w-5 rounded-full', n <= index ? 'bg-primary' : 'bg-muted')} />
-          ))}
-        </span>
+        <OnboardingLanguageSwitch />
       </div>
       </div>
     </div>
@@ -385,26 +396,31 @@ function CodeStep({
         aria-label={copyText('Código de verificación de 6 dígitos', '6-digit verification code', isV3, language)}
         aria-invalid={isV3 && invalidCode ? true : undefined}
         aria-describedby={isV3 && invalidCode ? 'verification-code-hint verification-code-error' : 'verification-code-hint'}
-        containerClassName="justify-center"
+        containerClassName="w-full max-w-xs mx-auto justify-center"
       >
-        <InputOTPGroup className="gap-2">
+        <InputOTPGroup className="grid w-full grid-cols-6 gap-2">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <InputOTPSlot
               key={i}
               index={i}
-              className="h-14 w-12 rounded-xl border border-input bg-card font-serif text-2xl first:rounded-xl last:rounded-xl"
+              className="h-14 w-full rounded-xl border border-input bg-card font-serif text-2xl first:rounded-xl last:rounded-xl"
             />
           ))}
         </InputOTPGroup>
       </InputOTP>
 
       <p id="verification-code-hint" className="mt-4 text-center text-sm text-muted-foreground">
-        {copyText('Prototipo: cualquier código de 6 dígitos funciona.', 'Test: any 6-digit code works except 000000.', isV3, language)}
+        {isV3
+          ? copyText('Prototipo: cualquier código de 6 dígitos funciona excepto 000000.', 'Test: any 6-digit code works except 000000.', true, language)
+          : 'Prototipo: cualquier código de 6 dígitos funciona.'}
       </p>
       {isV3 && invalidCode ? (
-        <div id="verification-code-error" role="alert" className="mt-3 flex items-start gap-2 rounded-xl border border-destructive bg-destructive-soft p-3 text-sm text-destructive">
-          <span className="font-semibold">{copyText('Código no válido.', 'Invalid code.', isV3, language)}</span>
-          <span>{copyText('Comprueba los seis dígitos e inténtalo de nuevo.', 'Check the six digits and try again.', isV3, language)}</span>
+        <div id="verification-code-error" role="alert" className="mt-3 flex items-start gap-2.5 rounded-2xl border-2 border-destructive bg-destructive-soft p-3.5 text-sm text-destructive">
+          <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">{copyText('Código no válido.', 'Invalid code.', isV3, language)}</p>
+            <p className="mt-0.5">{copyText('Comprueba los seis dígitos e inténtalo de nuevo.', 'Check the six digits and try again.', isV3, language)}</p>
+          </div>
         </div>
       ) : null}
 
@@ -569,7 +585,7 @@ function ScanStep({ identity, onDone }: { identity: Identity; onDone: () => void
         <span
           className={cn(
             'relative flex size-20 items-center justify-center rounded-full transition-colors duration-500',
-            finished ? 'bg-success text-white' : 'bg-primary text-primary-foreground',
+            finished ? 'bg-success text-success-foreground' : 'bg-primary text-primary-foreground',
           )}
         >
           {finished ? <Check className="size-9" strokeWidth={2.5} aria-hidden="true" /> : <Fingerprint className="size-9" aria-hidden="true" />}

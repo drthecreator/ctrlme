@@ -660,8 +660,12 @@ export function IdentityProvider({ children }: { children: React.ReactNode }) {
     [version],
   )
   const reset = useCallback(() => {
-    if (version === 'v3') setV3State(initialState)
-    else setV2State(initialState)
+    if (version === 'v3') {
+      localStorage.removeItem('ctrlme-v3-completed-plan')
+      setV3State(initialState)
+    } else {
+      setV2State(initialState)
+    }
   }, [version])
 
   const value = useMemo(() => ({ state, update, completeOnboarding, reset }), [state, update, completeOnboarding, reset])

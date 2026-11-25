@@ -1,0 +1,34 @@
+1:"/_next/static/chunks/1kw_wr8enlp0z.js"
+2:"/_next/static/chunks/40md_gadnns5m.js"
+3:"/_next/static/chunks/3j4_7bp8y6_td.js"
+4:"LoadingBoundaryProvider"
+5:I[76210,["$1","$2","$3"],"$4"]
+6:"$Sreact.fragment"
+7:I[48026,["$1","$2","$3"],"AppShell"]
+8:I[76210,["$1","$2","$3"],"default"]
+9:I[90604,["$1","$2","$3"],"default"]
+a:I[34523,["$1","$2","$3"],"Analytics"]
+11:I[63334,["$1","$2","$3"],"OutletBoundary"]
+12:"$Sreact.suspense"
+15:"ViewportBoundary"
+16:I[63334,["$1","$2","$3"],"$15"]
+17:"MetadataBoundary"
+18:I[63334,["$1","$2","$3"],"$17"]
+19:I[65155,["$1","$2","$3"],"IconMark"]
+:HL["/_next/static/chunks/0gmz19f431oy8.css","style"]
+:HL["/_next/static/chunks/0r45y1ebrqx8u.css","style"]
+c:X
+f:X
+f:C
+10:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$6","c",{"children":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":"$0:t:t:d:r:props:children:props:children:1:props:children:props:children:0:props:children:props:notFound:0:1:props:style","children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":"$0:t:t:d:r:props:children:props:children:1:props:children:props:children:0:props:children:props:notFound:0:1:props:children:props:children:1:props:style","children":404}],["$","div",null,{"style":"$0:t:t:d:r:props:children:props:children:1:props:children:props:children:0:props:children:props:notFound:0:1:props:children:props:children:2:props:style","children":["$","h2",null,{"style":"$0:t:t:d:r:props:children:props:children:1:props:children:props:children:0:props:children:props:notFound:0:1:props:children:props:children:2:props:children:props:style","children":"This page could not be found."}]}]]}]}]],null,["$","$L11",null,{"children":["$","$12",null,{"name":"Next.MetadataOutlet","children":"$@13"}]}]]}],"p":"$@14","v":null,"s":"$c"}}]]
+d:[["children",{"s":"/_not-found","h":96,"d":{"r":["$","$6","c",{"children":[null,["$","$L8",null,{"parallelRouterKey":"children","template":["$","$L9",null,{}]}]]}],"p":"$@e","v":"$f","s":"$c"},"c":"$Q10"}]]
+0:{"t":{"t":{"s":"","h":84,"d":{"r":["$","$L5",null,{"loading":[["$","div","l",{"className":"h-full space-y-4 p-5","role":"status","aria-label":"Cargando","children":[["$","div",null,{"className":"h-10 w-24 animate-pulse rounded-xl bg-muted"}],["$","div",null,{"className":"h-10 w-3/4 animate-pulse rounded-xl bg-muted"}],["$","div",null,{"className":"h-40 animate-pulse rounded-3xl bg-muted/70"}],["$","div",null,{"className":"h-28 animate-pulse rounded-3xl bg-muted/70"}],["$","span",null,{"className":"sr-only","children":"Cargando…"}]]}],[],null],"children":["$","$6","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0gmz19f431oy8.css","precedence":"next"}],["$","link","1",{"rel":"stylesheet","href":"/_next/static/chunks/0r45y1ebrqx8u.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/1kw_wr8enlp0z.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/40md_gadnns5m.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/3j4_7bp8y6_td.js","async":true}]],["$","html",null,{"lang":"es","className":"_8NX9hq_variable h-TBfq_variable","children":["$","body",null,{"className":"antialiased","children":[["$","$L7",null,{"children":["$","$L8",null,{"parallelRouterKey":"children","template":["$","$L9",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}],["$","$La",null,{}]]}]}]]}]}],"p":"$@b","v":null,"s":"$c"},"c":"$Qd"},"h":{"r":["$","$6","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L16",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1, viewport-fit=cover"}],["$","meta","2",{"name":"theme-color","content":"#f8f6f1"}],["$","meta","3",{"name":"color-scheme","content":"light dark"}]]}],["$","$L18",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$12",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Ctrl+Me · Tu identidad digital bajo control"}],["$","meta","1",{"name":"description","content":"Evalúa tu huella digital, limpia cuentas y sesiones, recibe alertas de filtraciones y aprende a proteger tus datos en 1 minuto."}],["$","meta","2",{"name":"generator","content":"v0.app"}],["$","link","3",{"rel":"icon","href":"/icon-light-32x32.png","media":"(prefers-color-scheme: light)"}],["$","link","4",{"rel":"icon","href":"/icon-dark-32x32.png","media":"(prefers-color-scheme: dark)"}],["$","link","5",{"rel":"icon","href":"/icon.svg","type":"image/svg+xml"}],["$","link","6",{"rel":"apple-touch-icon","href":"/apple-icon.png"}],["$","$L19","7",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1a","v":null,"s":"$c"}},"a":"$@1b","u":"$@1c","b":"0jhAck_wcFb-qkCmZX5ER"}
+13:null
+c:300
+1c:true
+c:C
+1b:0
+e:"$undefined"
+b:"$undefined"
+1a:"$undefined"
+14:"$undefined"
