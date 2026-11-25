@@ -1,0 +1,4 @@
+{"timestamp":"00:00:00.751","source":"Server","level":"LOG","message":"- Experiments (use with caution):"}
+{"timestamp":"00:00:00.751","source":"Server","level":"LOG","message":"  · staleTimes"}
+{"timestamp":"00:00:00.751","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:01.787","source":"Server","level":"WARN","message":"⚠ Your version of Next.js is affected by a known security vulnerability. This command is continuing after the upgrade reminder.\nReference: https://registry.npmjs.org/-/npm/v1/security/advisories/bulk"}

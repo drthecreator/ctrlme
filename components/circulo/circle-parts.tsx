@@ -42,3 +42,14 @@ export function when(at: number) {
   const days = Math.floor(hours / 24)
   return days === 1 ? 'ayer' : `hace ${days} días`
 }
+
+export function sinceWhen(at: number, language: 'es' | 'en', isV3: boolean) {
+  const hours = Math.floor((Date.now() - at) / 3_600_000)
+  if (isV3 && language === 'en') {
+    if (hours < 1) return 'since just now'
+    if (hours < 24) return `for ${hours} hr`
+    const days = Math.floor(hours / 24)
+    return days === 1 ? 'since yesterday' : `for ${days} days`
+  }
+  return `desde ${when(at).replace('hace ', '')}`
+}

@@ -558,6 +558,7 @@ function VoicePanel({
   transcript: string
   onStop: () => void
 }) {
+  const copy = usePrototypeCopy()
   const active = phase === 'listening' || phase === 'speaking'
   return (
     <div className="flex items-center gap-3 px-4 py-1">
@@ -577,15 +578,15 @@ function VoicePanel({
         ))}
       </div>
       <div className="min-w-0 flex-1" role="status" aria-live="polite">
-        <p className="text-sm font-semibold">{phaseLabel[phase]}</p>
+        <p className="text-sm font-semibold">{copy(phaseLabel[phase])}</p>
         <p className="min-h-5 truncate text-sm text-muted-foreground">
-          {phase === 'listening' && !transcript ? 'Habla con normalidad' : transcript ? `«${transcript}»` : ''}
+          {phase === 'listening' && !transcript ? copy('Habla con normalidad') : transcript ? `«${transcript}»` : ''}
         </p>
       </div>
       <button
         type="button"
         onClick={onStop}
-        aria-label={phase === 'speaking' ? 'Detener respuesta' : 'Cancelar mensaje de voz'}
+        aria-label={copy(phase === 'speaking' ? 'Detener respuesta' : 'Cancelar mensaje de voz')}
         className="flex size-12 shrink-0 items-center justify-center rounded-full border border-border bg-background transition-colors hover:bg-muted"
       >
         {phase === 'speaking' ? <Square className="size-4" aria-hidden="true" /> : <X className="size-5" aria-hidden="true" />}

@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { BottomNav, SideNav } from '@/components/bottom-nav'
 import { IdentityProvider, useIdentity } from '@/lib/identity-store'
-import { PrototypeProvider, usePrototypeCopy } from '@/lib/prototype-context'
+import { PrototypeProvider, usePrototype, usePrototypeCopy } from '@/lib/prototype-context'
 import { PrototypeControls } from '@/components/prototype-controls'
 import { cn } from '@/lib/utils'
 
@@ -21,7 +21,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 function Frame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { state } = useIdentity()
+  const { version, language } = usePrototype()
   const copy = usePrototypeCopy()
+  const isV3 = version === 'v3'
   const bare = pathname === '/' && !state.onboarded
   const previousPageRef = useRef<string | null>(null)
 
@@ -38,11 +40,14 @@ function Frame({ children }: { children: React.ReactNode }) {
     const shouldMoveFocus = previousPageRef.current !== null && previousPageRef.current !== page
     previousPageRef.current = page
     if (shouldMoveFocus) heading.focus()
-  }, [pathname, state.onboarded])
+  }, [pathname, state.onboarded, version, language])
 
   return (
     <div
-      className={cn('min-h-dvh', !bare && 'sm:flex sm:items-center sm:justify-center sm:py-8 lg:block lg:min-h-0 lg:py-0')}
+      className={cn(
+        'min-h-dvh',
+        !bare && !isV3 && 'sm:flex sm:items-center sm:justify-center sm:py-8 lg:block lg:min-h-0 lg:py-0',
+      )}
     >
       <PrototypeControls />
       <a
@@ -57,7 +62,9 @@ function Frame({ children }: { children: React.ReactNode }) {
           'relative mx-auto flex h-dvh w-full flex-col overflow-clip bg-background',
           bare
             ? 'max-w-none'
-            : 'max-w-[430px] sm:h-[min(900px,calc(100dvh-4rem))] sm:rounded-[2.75rem] sm:border sm:border-border sm:shadow-[0_40px_80px_-30px_oklch(0.2_0.025_262/0.35)] lg:h-dvh lg:max-w-none lg:flex-row lg:rounded-none lg:border-0 lg:shadow-none',
+            : isV3
+              ? 'max-w-none lg:flex-row'
+              : 'max-w-[430px] sm:h-[min(900px,calc(100dvh-4rem))] sm:rounded-[2.75rem] sm:border sm:border-border sm:shadow-[0_40px_80px_-30px_oklch(0.2_0.025_262/0.35)] lg:h-dvh lg:max-w-none lg:flex-row lg:rounded-none lg:border-0 lg:shadow-none',
         )}
       >
         {bare ? null : <SideNav />}

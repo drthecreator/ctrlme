@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { ArrowRight, Check, ExternalLink } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { BREACH_STEPS, useIdentity } from '@/lib/identity-store'
+import { usePrototypeCopy } from '@/lib/prototype-context'
 import { cn } from '@/lib/utils'
 
 export function BreachChecklist() {
   const { state, update } = useIdentity()
+  const copy = usePrototypeCopy()
   const completed = state.breachSteps
   const allDone = completed.length === BREACH_STEPS.length
 
@@ -21,7 +23,7 @@ export function BreachChecklist() {
     <section aria-labelledby="acciones-title" className="mt-7 px-5">
       <div className="mb-3 flex items-end justify-between gap-3">
         <h2 id="acciones-title" className="text-lg font-semibold tracking-tight">
-          Acciones recomendadas
+          {copy('Acciones recomendadas')}
         </h2>
         <p
           className="text-sm font-medium text-muted-foreground tabular-nums"
@@ -29,8 +31,8 @@ export function BreachChecklist() {
           aria-live="polite"
           aria-atomic="true"
         >
-          {completed.length} de {BREACH_STEPS.length}
-          <span className="sr-only"> pasos completados</span>
+          {completed.length} {copy('de')} {BREACH_STEPS.length}
+          <span className="sr-only"> {copy('pasos completados')}</span>
         </p>
       </div>
 
@@ -47,11 +49,11 @@ export function BreachChecklist() {
                   aria-hidden="true"
                   className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg border-2 border-input bg-card transition-colors peer-checked:border-success peer-checked:bg-success peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50"
                 >
-                  <Check className={cn('size-4 text-white', !done && 'opacity-0')} strokeWidth={3} />
+                  <Check className={cn('size-4 text-success-foreground', !done && 'opacity-0')} strokeWidth={3} />
                 </span>
                 <span className="flex-1">
                   <span className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Paso {index + 1}
+                    {copy('Paso')} {index + 1}
                   </span>
                   <span
                     className={cn(
@@ -59,9 +61,9 @@ export function BreachChecklist() {
                       done && 'text-muted-foreground line-through decoration-muted-foreground/40',
                     )}
                   >
-                    {step.title}
+                    {copy(step.title)}
                   </span>
-                  {!done ? <span className="mt-0.5 block text-sm text-muted-foreground">{step.detail}</span> : null}
+                  {!done ? <span className="mt-0.5 block text-sm text-muted-foreground">{copy(step.detail)}</span> : null}
                 </span>
               </label>
               {link && !done ? (
@@ -72,13 +74,13 @@ export function BreachChecklist() {
                     rel="noopener noreferrer"
                     className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'mt-3 ml-10')}
                   >
-                    {link.label}
+                    {copy(link.label)}
                     <ExternalLink aria-hidden="true" />
-                    <span className="sr-only"> (se abre en una pestaña nueva)</span>
+                    <span className="sr-only"> {copy('(se abre en una pestaña nueva)')}</span>
                   </a>
                 ) : (
                   <Link href={link.href} className={cn(buttonVariants({ variant: 'outline', size: 'touch-sm' }), 'mt-3 ml-10')}>
-                    {link.label}
+                    {copy(link.label)}
                     <ArrowRight aria-hidden="true" />
                   </Link>
                 )
@@ -95,11 +97,11 @@ export function BreachChecklist() {
         aria-describedby={allDone ? undefined : 'hecho-hint'}
         onClick={() => update((s) => ({ ...s, breachResolved: true }))}
       >
-        Marcar como hecho
+        {copy('Marcar como hecho')}
       </Button>
       {!allDone ? (
         <p id="hecho-hint" className="mt-2 text-center text-sm text-muted-foreground">
-          Marca los {BREACH_STEPS.length} pasos para cerrar la alerta.
+          {copy(`Marca los ${BREACH_STEPS.length} pasos para cerrar la alerta.`)}
         </p>
       ) : null}
     </section>

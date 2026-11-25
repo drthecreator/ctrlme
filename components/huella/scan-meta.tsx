@@ -34,7 +34,7 @@ export function ScanMeta() {
         className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
       >
         <RefreshCw className="size-3.5" aria-hidden="true" />
-        {formatRelative(state.scannedAt, Date.now())}
+        {copy(formatRelative(state.scannedAt, Date.now()))}
         <span className="sr-only">. {copy('Volver a analizar')}</span>
       </button>
     </div>

@@ -387,7 +387,7 @@ export function AssessmentForm() {
             <p className="text-sm text-muted-foreground">{copy('Tu puntuación')}</p>
             <p className="sr-only">{total} {copy('de 100')}.</p>
             <p className={cn('mt-0.5 font-serif text-[1.75rem] leading-tight', toneStyles[level.tone].text)}>
-              {level.label}
+              {copy(level.label)}
             </p>
           </div>
         </div>
@@ -398,7 +398,7 @@ export function AssessmentForm() {
             return (
               <div key={metric.label}>
                 <div className="flex items-baseline justify-between text-sm">
-                  <dt className="font-medium">{metric.label}</dt>
+                  <dt className="font-medium">{copy(metric.label)}</dt>
                   <dd className="font-semibold tabular-nums">{metric.value}%</dd>
                 </div>
                 <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
@@ -514,7 +514,7 @@ function Segmented<V extends string>({
         {options.map((option) => (
           <label
             key={option.value}
-            className={cn('relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 text-sm font-medium transition-all has-checked:font-semibold has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'text-foreground has-checked:bg-primary has-checked:text-primary-foreground' : 'text-muted-foreground has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm')}
+            className={cn('relative flex h-auto min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 py-1.5 text-center text-sm leading-tight font-medium transition-all has-checked:font-semibold has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'text-foreground has-checked:bg-primary has-checked:text-primary-foreground' : 'text-muted-foreground has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm')}
           >
             <input
               type="radio"
@@ -551,7 +551,7 @@ function ChoiceList<V extends string>({
       {options.map((option) => (
         <label
           key={option.value}
-          className={cn('relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'has-checked:bg-primary/10' : 'has-checked:bg-primary/[0.04]')}
+          className={cn('relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'has-checked:bg-primary/15' : 'has-checked:bg-primary/[0.04]')}
         >
           <input
             type="radio"
@@ -565,7 +565,7 @@ function ChoiceList<V extends string>({
             aria-hidden="true"
             className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-input transition-colors peer-checked:border-primary peer-checked:bg-primary"
           >
-            <Check className="size-3.5 text-primary-foreground" strokeWidth={3} />
+            <Check className={cn('size-3.5 text-primary-foreground', value !== option.value && 'opacity-0')} strokeWidth={3} />
           </span>
           <span className="flex flex-col">
             <span className="text-[0.9375rem] font-medium">{copy(option.label)}</span>

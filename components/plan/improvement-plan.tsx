@@ -39,9 +39,9 @@ export function ImprovementPlan() {
   return (
     <div className="px-5">
       <section aria-label={copy('Progreso posible')} className="surface flex items-center gap-4 rounded-3xl p-5">
-        <ScoreBlock label={copy('Ahora')} score={total} levelLabel={currentLevel.label} tone={currentLevel.tone} />
+        <ScoreBlock label={copy('Ahora')} score={total} levelLabel={copy(currentLevel.label)} tone={currentLevel.tone} />
         <ArrowRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <ScoreBlock label={copy('Si completas el plan')} score={potential} levelLabel={potentialLevel.label} tone={potentialLevel.tone} />
+        <ScoreBlock label={copy('Si completas el plan')} score={potential} levelLabel={copy(potentialLevel.label)} tone={potentialLevel.tone} />
       </section>
 
       {isV3 ? (
@@ -53,7 +53,7 @@ export function ImprovementPlan() {
               </button>
             ))}
           </div>
-          <label className="flex items-center justify-between gap-3 text-sm font-medium" htmlFor="plan-sort">
+          <label className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium" htmlFor="plan-sort">
             {copy('Ordenar por impacto')}
             <select id="plan-sort" value={sort} onChange={(event) => setSort(event.target.value as 'high' | 'low')} className="min-h-11 max-w-48 rounded-xl border border-input bg-background px-3 text-sm text-foreground">
               <option value="high">{copy('Mayor impacto')}</option>
@@ -63,14 +63,14 @@ export function ImprovementPlan() {
         </section>
       ) : null}
 
-      {!isV3 && plan.length === 0 ? (
+      {plan.length === 0 && (!isV3 || (filter !== 'completed' && visibleItems.length === 0)) ? (
         <div className="surface mt-4 flex flex-col items-center rounded-3xl p-6 text-center">
           <span className="flex size-14 items-center justify-center rounded-full bg-success-soft text-success">
             <PartyPopper className="size-7" aria-hidden="true" />
           </span>
-          <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">¡Plan completado!</h2>
+          <h2 className="mt-4 font-serif text-[1.75rem] leading-tight">{copy('¡Plan completado!')}</h2>
           <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-            Seguiremos analizando tu huella cada semana.
+            {copy('Seguiremos analizando tu huella cada semana.')}
           </p>
         </div>
       ) : visibleItems.length === 0 ? (
@@ -86,29 +86,43 @@ export function ImprovementPlan() {
               <li key={item.id} className="surface rounded-3xl p-4">
                 <div className="flex items-start gap-3">
                   <span aria-hidden="true" className={cn('flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold', isCompleted ? 'bg-success-soft text-success' : 'bg-secondary text-primary')}>
-                    {isCompleted ? <Check aria-hidden="true" /> : index + 1}
+                    {isCompleted ? <Check className="size-4" aria-hidden="true" /> : index + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-[0.9375rem] leading-snug font-semibold text-balance">{item.title}</h2>
-                    <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{item.description}</p>
+                    <h2 className="text-[0.9375rem] leading-snug font-semibold text-balance">{copy(item.title)}</h2>
+                    <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{copy(item.description)}</p>
                   </div>
                   {isCompleted ? <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-semibold text-success">{copy('Completada')}</span> : (
-                    <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success tabular-nums">+{item.gain}<span className="sr-only"> puntos</span></span>
+                    <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success tabular-nums">+{item.gain}<span className="sr-only"> {copy('puntos')}</span></span>
                   )}
                 </div>
                 {!isCompleted && (item.href || item.selfFix) ? (
-                  <div className="mt-3 flex gap-2 pl-11">
-                    {item.href ? (
-                      <Link href={item.href} className={cn(buttonVariants({ variant: isV3 ? 'outline' : item.selfFix ? 'outline' : 'default', size: 'touch-sm' }), 'flex-1')}>
-                        {item.hrefLabel}
+                  <div className="mt-3 flex flex-wrap gap-2 sm:pl-11">
+                    {item.href && item.hrefLabel ? (
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          buttonVariants({ variant: isV3 ? 'outline' : item.selfFix ? 'outline' : 'default', size: 'touch-sm' }),
+                          'h-auto min-h-11 min-w-[8.5rem] flex-1 py-2 text-center whitespace-normal',
+                        )}
+                      >
+                        {copy(item.hrefLabel)}
                       </Link>
                     ) : null}
                     {item.selfFix ? (
-                      <Button size="touch-sm" variant={isV3 ? 'secondary' : item.href ? 'ghost' : 'outline'} className={cn('flex-1', isV3 && 'border-success/40 bg-success-soft text-success hover:bg-success-soft/70')} onClick={() => {
-                        if (isV3) setCompletedItems((items) => items.some((done) => done.id === item.id) ? items : [item, ...items])
-                        update(item.selfFix!)
-                      }}>
-                        <Check aria-hidden="true" />{copy('Ya lo hice')}<span className="sr-only">: {item.title}</span>
+                      <Button
+                        size="touch-sm"
+                        variant={isV3 ? 'outline' : item.href ? 'ghost' : 'outline'}
+                        className={cn(
+                          'h-auto min-h-11 min-w-[8.5rem] flex-1 py-2 text-center whitespace-normal',
+                          isV3 && 'border-success/50 bg-success-soft text-success hover:bg-success/20',
+                        )}
+                        onClick={() => {
+                          if (isV3) setCompletedItems((items) => items.some((done) => done.id === item.id) ? items : [item, ...items])
+                          update(item.selfFix!)
+                        }}
+                      >
+                        <Check aria-hidden="true" />{copy('Ya lo hice')}<span className="sr-only">: {copy(item.title)}</span>
                       </Button>
                     ) : null}
                   </div>

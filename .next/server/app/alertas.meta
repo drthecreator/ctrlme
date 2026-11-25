@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/alertas/layout,_N_T_/alertas/page,_N_T_/alertas"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/alertas/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/ce0fa137ac44eac9170c7eb36464625ec9f5b2b59ce12d3354bc4bcca67e07d6/$/alertas",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/alertas/page"
+    },
+    "isFallback": false
+  }
+}

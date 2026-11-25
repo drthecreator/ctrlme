@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useIsV3, usePrototypeCopy } from '@/lib/prototype-context'
-import { ArrowRight, Briefcase, MapPin, Share2, UserRound, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Briefcase, Lock, MapPin, Share2, UserRound, type LucideIcon } from 'lucide-react'
 import { BottomSheet } from '@/components/bottom-sheet'
 import { buttonVariants } from '@/components/ui/button'
 import { useIdentity } from '@/lib/identity-store'
@@ -122,11 +122,11 @@ export function CategoryGrid() {
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 px-5 lg:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-3 px-5 min-[420px]:grid-cols-2 lg:grid-cols-4">
         {categories.map((category) => (
           <li key={category.id} className="surface flex flex-col rounded-3xl p-4">
-            <span className="flex items-center justify-between">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-secondary text-primary">
+            <span className="flex flex-wrap items-center justify-between gap-2">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
                 <category.icon className="size-5" aria-hidden="true" />
               </span>
               <ExposureBadge exposure={category.exposure} />
@@ -137,7 +137,10 @@ export function CategoryGrid() {
               type="button"
               onClick={() => setOpenId(category.id)}
               aria-haspopup="dialog"
-              className={cn(buttonVariants({ variant: 'secondary', size: 'touch-sm' }), 'mt-4 w-full')}
+              className={cn(
+                buttonVariants({ variant: 'secondary', size: 'touch-sm' }),
+                'mt-4 h-auto min-h-11 w-full py-2 text-center whitespace-normal',
+              )}
             >
               {copy('Ver detalles')}
               <span className="sr-only"> {copy('de')} {copy(category.title.toLowerCase())}</span>
@@ -145,6 +148,14 @@ export function CategoryGrid() {
           </li>
         ))}
       </ul>
+
+      <p className="mx-5 mt-5 flex items-start gap-3 rounded-2xl bg-success-soft p-4 text-sm leading-relaxed text-success">
+        <Lock className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+        <span>
+          <strong className="font-semibold">{copy('Seguro:')}</strong>{' '}
+          {copy('no tenemos acceso a tu información privada. Solo analizamos datos públicos.')}
+        </span>
+      </p>
 
       <BottomSheet open={current !== null} onClose={() => setOpenId(null)} title={current ? copy(current.title) : ''}>
         {current ? <CategoryDetail category={current} isV3={isV3} /> : null}

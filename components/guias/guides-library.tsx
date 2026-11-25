@@ -5,7 +5,7 @@ import { localize, useIsV3, usePrototype } from '@/lib/prototype-context'
 import { Play } from 'lucide-react'
 import { featuredPills, formatDuration, pillCategories, pills, type Pill, type PillCategory } from '@/lib/guides'
 import { StoryViewer } from '@/components/guias/story-viewer'
-import { PillGlyph, categoryTone } from '@/components/guias/pill-visuals'
+import { PillGlyph, categoryTone, categoryToneV3 } from '@/components/guias/pill-visuals'
 import { cn } from '@/lib/utils'
 
 type Filter = 'todas' | PillCategory
@@ -33,7 +33,7 @@ export function GuidesLibrary() {
               <article className="surface flex h-full flex-col overflow-hidden rounded-3xl">
                 <div
                   aria-hidden="true"
-                  className={cn('relative flex h-40 items-center justify-center overflow-hidden', isV3 ? 'bg-secondary text-secondary-foreground ring-1 ring-border' : categoryTone[pill.category])}
+                  className={cn('relative flex h-40 items-center justify-center overflow-hidden', isV3 ? categoryToneV3[pill.category] : categoryTone[pill.category], isV3 && 'border-b border-border/60')}
                 >
                   <span className="absolute -bottom-10 -left-10 size-40 rounded-full border border-current opacity-15" />
                   <span className="absolute -top-12 -right-6 size-32 rounded-full border border-current opacity-15" />
@@ -42,7 +42,7 @@ export function GuidesLibrary() {
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="text-lg leading-snug font-semibold text-balance">{copy(pill.title)}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {formatDuration(pill.seconds)} · {copy('Historia visual')} · {copy(categoryLabel[pill.category])}
+                    {copy(formatDuration(pill.seconds))} · {copy('Historia visual')} · {copy(categoryLabel[pill.category])}
                   </p>
                   <button
                     type="button"
@@ -53,7 +53,7 @@ export function GuidesLibrary() {
                       <Play className="size-4 translate-x-px fill-current" aria-hidden="true" />
                     </span>
                     {copy('Ver historia')}
-                    <span className="sr-only">: {pill.title}</span>
+                    <span className="sr-only">: {copy(pill.title)}</span>
                   </button>
                 </div>
               </article>
@@ -86,7 +86,7 @@ export function GuidesLibrary() {
           ))}
         </div>
 
-        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((pill) => (
             <li key={pill.id} id={pill.id} className="scroll-mt-24">
               <button
@@ -96,15 +96,15 @@ export function GuidesLibrary() {
               >
                 <span
                   aria-hidden="true"
-                  className={cn('relative flex h-28 w-full items-center justify-center overflow-hidden', isV3 ? 'bg-secondary text-secondary-foreground ring-1 ring-border' : categoryTone[pill.category])}
+                  className={cn('relative flex h-28 w-full items-center justify-center overflow-hidden', isV3 ? categoryToneV3[pill.category] : categoryTone[pill.category], isV3 && 'border-b border-border/60')}
                 >
                   <span className="absolute -right-6 -bottom-8 size-24 rounded-full border border-current opacity-20" />
                   <PillGlyph name={pill.icon} className="size-11" />
-                  <span className="absolute bottom-2 left-2 flex size-8 items-center justify-center rounded-full bg-background/90 text-primary">
+                  <span className="absolute bottom-2 left-2 flex size-8 items-center justify-center rounded-full bg-card text-card-foreground shadow-xs ring-1 ring-border/50">
                     <Play className="size-3.5 translate-x-px fill-current" />
                   </span>
-                  <span className="absolute right-2 bottom-2 rounded-full bg-background/90 px-2 py-0.5 text-xs font-semibold text-primary">
-                    {formatDuration(pill.seconds)}
+                  <span className="absolute right-2 bottom-2 rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-card-foreground shadow-xs ring-1 ring-border/50">
+                    {copy(formatDuration(pill.seconds))}
                   </span>
                 </span>
                 <span className="flex flex-1 flex-col p-3.5">

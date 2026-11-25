@@ -76,7 +76,7 @@ export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
 
   return (
     <div className="mx-auto flex w-full max-w-[300px] flex-col items-center">
-      <div className="relative w-full">
+      <div className="relative w-full [container-type:inline-size]">
         <svg viewBox="0 0 260 208" className="w-full overflow-visible" aria-hidden="true">
           <defs>
             <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="260" height="208">
@@ -128,14 +128,36 @@ export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
           </text>
         </svg>
 
-        <div className="absolute inset-x-0 top-[61%] flex -translate-y-1/2 flex-col items-center">
-          <p className="font-serif text-[4.5rem] leading-none tracking-tight tabular-nums">{Math.round(shown)}</p>
-          <p className="mt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">de 100</p>
-          <span className={cn('mt-2.5 rounded-full px-3 py-1 text-sm font-semibold', toneStyles[level.tone].soft)}>
-            {isV3 ? t(({ destructive: 'Protección escasa', warning: 'Protección media', success: 'Protección excelente' } as const)[level.tone], language) : level.label}
-          </span>
+        <div className="absolute inset-x-0 top-[56%] flex -translate-y-1/2 flex-col items-center">
+          <p
+            className={cn(
+              'font-serif leading-none tracking-tight tabular-nums',
+              isV3 ? 'text-[min(4.5rem,23cqw)]' : 'text-[4.5rem]',
+            )}
+          >
+            {Math.round(shown)}
+          </p>
+          <p
+            className={cn(
+              'mt-1 font-medium tracking-wide text-muted-foreground uppercase',
+              isV3 ? 'text-[min(0.875rem,4.5cqw)]' : 'text-xs',
+            )}
+          >
+            {isV3 ? t('de 100', language) : 'de 100'}
+          </p>
+          {!isV3 ? (
+            <span className={cn('mt-2.5 rounded-full px-3 py-1 text-sm font-semibold', toneStyles[level.tone].soft)}>
+              {level.label}
+            </span>
+          ) : null}
         </div>
       </div>
+
+      {isV3 ? (
+        <span className={cn('mt-1 rounded-full px-3.5 py-1 text-center text-sm font-semibold', toneStyles[level.tone].soft)}>
+          {t(({ destructive: 'Protección escasa', warning: 'Protección media', success: 'Protección excelente' } as const)[level.tone], language)}
+        </span>
+      ) : null}
 
       {cta ? (
         <span
@@ -152,18 +174,20 @@ export function ScoreArc({ score, cta }: { score: number; cta?: string }) {
 }
 
 export function ScoreLegend() {
-  const isV3 = usePrototype().version === 'v3'
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
   const zones: { tone: Tone; label: string; range: string }[] = [
-    { tone: 'destructive', label: isV3 ? 'Protección escasa' : 'Bajo', range: '0–59' },
-    { tone: 'warning', label: isV3 ? 'Protección media' : 'Medio', range: '60–84' },
-    { tone: 'success', label: isV3 ? 'Protección excelente' : 'Alto', range: '85–100' },
+    { tone: 'destructive', label: isV3 ? t('Protección escasa', language) : 'Bajo', range: '0–59' },
+    { tone: 'warning', label: isV3 ? t('Protección media', language) : 'Medio', range: '60–84' },
+    { tone: 'success', label: isV3 ? t('Protección excelente', language) : 'Alto', range: '85–100' },
   ]
   return (
-    <ul className="flex items-center justify-center gap-4 text-xs text-muted-foreground" aria-hidden="true">
+    <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground" aria-hidden="true">
       {zones.map((zone) => (
-        <li key={zone.tone} className="flex items-center gap-1.5">
-          <span className={cn('size-2 rounded-full', toneStyles[zone.tone].dot)} />
-          {zone.label} <span className="tabular-nums opacity-70">{zone.range}</span>
+        <li key={zone.tone} className="flex items-center gap-1.5 whitespace-nowrap">
+          <span className={cn('size-2 shrink-0 rounded-full', toneStyles[zone.tone].dot)} />
+          <span>{zone.label}</span>
+          <span className={cn('tabular-nums', !isV3 && 'opacity-70')}>{zone.range}</span>
         </li>
       ))}
     </ul>

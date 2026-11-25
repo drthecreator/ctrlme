@@ -81,7 +81,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
           <button
             type="button"
             onClick={onClose}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-border"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-xs transition-colors hover:bg-muted"
           >
             <X className="size-5" aria-hidden="true" />
             <span className="sr-only">{copy('Cerrar')}</span>

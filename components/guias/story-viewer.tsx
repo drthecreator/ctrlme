@@ -72,19 +72,19 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
       ref={dialogRef}
       onClose={onClose}
       aria-labelledby="story-title"
-      className="m-auto h-dvh max-h-none w-full max-w-[430px] bg-primary p-0 text-primary-foreground backdrop:bg-foreground/60 backdrop:backdrop-blur-sm sm:h-[min(900px,calc(100dvh-4rem))] sm:rounded-[2.75rem]"
+      className="m-auto h-dvh max-h-none w-full max-w-[430px] bg-brand-surface p-0 text-brand-surface-foreground backdrop:bg-foreground/60 backdrop:backdrop-blur-sm sm:h-[min(900px,calc(100dvh-4rem))] sm:rounded-3xl"
     >
       {pill && slide ? (
         <div className="flex h-full flex-col px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]">
           <div className="flex gap-1.5" aria-hidden="true">
             {slides.map((_, i) => (
-              <span key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-primary-foreground/25">
+              <span key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-brand-surface-foreground/25">
                 {i < index ? (
-                  <span className="block h-full w-full bg-primary-foreground" />
+                  <span className="block h-full w-full bg-brand-surface-foreground" />
                 ) : i === index ? (
                   <span
                     key={`${pill.id}-${index}-${durationMs}`}
-                    className="block h-full w-full origin-left bg-primary-foreground"
+                    className="block h-full w-full origin-left bg-brand-surface-foreground"
                     style={{
                       animation: `story-fill ${durationMs}ms linear forwards`,
                       animationPlayState: playing ? 'running' : 'paused',
@@ -99,14 +99,14 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
           </div>
 
           <div className="mt-3 flex items-center gap-1">
-            <p id="story-title" className="mr-auto min-w-0 truncate text-sm font-medium text-primary-foreground/75">
+            <p id="story-title" className="mr-auto min-w-0 truncate text-sm font-medium text-brand-surface-foreground/80">
               {copy(pill.title)}
             </p>
             <Button
               variant="ghost"
               size="icon-lg"
               onClick={() => setPlaying((p) => !p)}
-              className="size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              className="size-11 rounded-full text-brand-surface-foreground hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground"
               aria-label={copy(playing ? 'Pausar' : 'Reproducir')}
             >
               {playing ? <Pause className="size-5" aria-hidden="true" /> : <Play className="size-5" aria-hidden="true" />}
@@ -121,8 +121,8 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                 }}
                 aria-pressed={narrate}
                 className={cn(
-                  'size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground',
-                  narrate && 'bg-primary-foreground/15',
+                  'size-11 rounded-full text-brand-surface-foreground hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground',
+                  narrate && 'bg-brand-surface-foreground/15',
                 )}
                 aria-label={copy(narrate ? 'Desactivar narración' : 'Activar narración en voz alta')}
               >
@@ -133,7 +133,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
               variant="ghost"
               size="icon-lg"
               onClick={onClose}
-              className={cn('size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground', isV3 && 'border border-primary-foreground/40 bg-primary-foreground/15')}
+              className={cn('size-11 rounded-full text-brand-surface-foreground hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground', isV3 && 'border border-brand-surface-foreground/45 bg-brand-surface-foreground/15')}
               aria-label={copy('Cerrar historia')}
             >
               <X className="size-5" aria-hidden="true" />
@@ -144,15 +144,15 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
             <div
               key={`${pill.id}-${index}`}
               aria-hidden="true"
-              className="relative mb-6 flex size-28 shrink-0 items-center justify-center self-start rounded-full bg-primary-foreground/10 motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:duration-500"
+              className="relative mb-6 flex size-28 shrink-0 items-center justify-center self-start rounded-full bg-brand-surface-foreground/10 motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:duration-500"
             >
-              <span className="absolute -inset-3 rounded-full border border-primary-foreground/15" />
-              <span className="absolute -inset-7 rounded-full border border-primary-foreground/10" />
+              <span className="absolute -inset-3 rounded-full border border-brand-surface-foreground/15" />
+              <span className="absolute -inset-7 rounded-full border border-brand-surface-foreground/10" />
               <PillGlyph name={slide.icon} className="size-12 text-accent" />
             </div>
 
             <p className="text-sm font-semibold tracking-[0.12em] text-accent uppercase">
-              {index + 1} {copy('de')} {slides.length} · {formatDuration(pill.seconds)}
+              {index + 1} {copy('de')} {slides.length} · {copy(formatDuration(pill.seconds))}
             </p>
             <h2
               aria-live="polite"
@@ -164,19 +164,19 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
               </span>
               {copy(slide.heading)}
             </h2>
-            <p className="mt-3 text-lg leading-relaxed text-pretty text-primary-foreground/80">{copy(slide.body)}</p>
+            <p className="mt-3 text-lg leading-relaxed text-pretty text-brand-surface-foreground/85">{copy(slide.body)}</p>
 
             {slide.example ? (
               <figure
                 className={cn(
-                  'mt-5 rounded-2xl border-l-4 bg-primary-foreground/10 p-4',
-                  slide.example.tone === 'bad' ? 'border-l-destructive' : 'border-l-accent',
+                  'mt-5 rounded-2xl border-l-4 bg-brand-surface-foreground/10 p-4',
+                  slide.example.tone === 'bad' ? 'border-l-red-400' : 'border-l-accent',
                 )}
               >
                 <figcaption className="flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
                   {slide.example.tone === 'bad' ? (
                     <>
-                      <TriangleAlert className="size-4 text-destructive" aria-hidden="true" />
+                      <TriangleAlert className="size-4 text-red-300" aria-hidden="true" />
                       {copy('Ejemplo de riesgo')}
                     </>
                   ) : (
@@ -206,7 +206,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                 size="touch"
                 disabled={index === 0}
                 onClick={() => setIndex((i) => i - 1)}
-                className="flex-1 border border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="flex-1 border border-brand-surface-foreground/25 text-brand-surface-foreground hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground"
               >
                 {copy('Anterior')}
               </Button>
@@ -215,7 +215,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
                   variant="ghost"
                   size="touch"
                   onClick={onClose}
-                  className="flex-1 border border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  className="flex-1 border border-brand-surface-foreground/25 text-brand-surface-foreground hover:bg-brand-surface-foreground/10 hover:text-brand-surface-foreground"
                 >
                   {copy('Terminar')}
                 </Button>

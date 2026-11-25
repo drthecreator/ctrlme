@@ -12,10 +12,11 @@ import {
   type NetworkId,
 } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
-import { usePrototypeCopy } from '@/lib/prototype-context'
+import { useIsV3, usePrototypeCopy } from '@/lib/prototype-context'
 
 export function ProfilesPanel() {
   const { state, update } = useIdentity()
+  const isV3 = useIsV3()
   const copy = usePrototypeCopy()
   const networks = getUsedNetworks(state)
 
@@ -50,7 +51,7 @@ export function ProfilesPanel() {
         red.
       </PanelIntro>
 
-      <ul className="flex flex-col gap-3" aria-label="Perfiles">
+      <ul className="flex flex-col gap-3" aria-label={copy('Perfiles')}>
         {networks.map((network) => {
           const isPublic = isProfilePublic(state, network.id)
           return (
@@ -125,7 +126,7 @@ export function ProfilesPanel() {
 
         <Link
           href="/guias#huella-publica"
-          className={cn(buttonVariants({ variant: 'ghost', size: 'touch-sm' }), 'mt-3 w-full')}
+          className={cn(buttonVariants({ variant: isV3 ? 'outline' : 'ghost', size: 'touch-sm' }), 'mt-3 h-auto min-h-11 w-full py-2 text-center whitespace-normal')}
         >
           <BookOpen aria-hidden="true" />
           {copy('Cómo revisar lo que publicas')}

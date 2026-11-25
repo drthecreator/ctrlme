@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Clock, ShieldAlert, ShieldCheck, UserPlus } from 'lucide-react'
 import { BottomSheet } from '@/components/bottom-sheet'
-import { Avatar, ScopeChips, when } from '@/components/circulo/circle-parts'
+import { Avatar, ScopeChips, sinceWhen, when } from '@/components/circulo/circle-parts'
 import { fieldClass } from '@/components/onboarding/onboarding-flow'
 import { SectionTitle } from '@/components/screen'
 import { getLevel, toneStyles } from '@/lib/score'
@@ -132,12 +132,12 @@ export function CircleHome() {
       <InviteSheet open={inviting} onClose={() => setInviting(false)} />
       {pendingRevoke ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingRevoke(null) }}>
-          <section role="alertdialog" aria-modal="true" aria-labelledby="revoke-title" aria-describedby="revoke-description" className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+          <section role="alertdialog" aria-modal="true" aria-labelledby="revoke-title" aria-describedby="revoke-description" className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
             <h2 id="revoke-title" className="text-xl font-semibold">{copy('¿Retirar el acceso?')}</h2>
             <p id="revoke-description" className="mt-2 text-sm leading-relaxed text-muted-foreground">{pendingRevoke.name} {copy('dejará de ver la información que compartes. Puedes volver a invitarle más adelante.')}</p>
             <div className="mt-6 flex justify-end gap-2">
-              <button id="revoke-cancel" type="button" autoFocus onClick={() => setPendingRevoke(null)} className="min-h-11 rounded-xl border border-border bg-card px-4 text-sm font-semibold">{copy('Cancelar')}</button>
-              <button type="button" onClick={() => { revoke(pendingRevoke.id); setPendingRevoke(null) }} className="min-h-11 rounded-xl bg-destructive px-4 text-sm font-semibold text-white">{copy('Retirar acceso')}</button>
+              <button id="revoke-cancel" type="button" autoFocus onClick={() => setPendingRevoke(null)} className="min-h-11 rounded-xl border border-border bg-background px-4 text-sm font-semibold">{copy('Cancelar')}</button>
+              <button type="button" onClick={() => { revoke(pendingRevoke.id); setPendingRevoke(null) }} className="min-h-11 rounded-xl bg-destructive px-4 text-sm font-semibold text-destructive-foreground">{copy('Retirar acceso')}</button>
             </div>
           </section>
         </div>
@@ -238,6 +238,7 @@ function MemberCard({ member }: { member: CircleMember }) {
 }
 
 function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) {
+  const { version, language } = usePrototype()
   const copy = usePrototypeCopy()
   return (
     <div className="surface rounded-3xl p-4">
@@ -246,7 +247,7 @@ function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) 
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{grant.name}</p>
           <p className="text-sm text-muted-foreground">
-            {copy(grant.relation)} · {copy('desde')} {when(grant.since).replace('hace ', '')}
+            {copy(grant.relation)} · {sinceWhen(grant.since, language, version === 'v3')}
           </p>
         </div>
       </div>
@@ -258,7 +259,7 @@ function GrantCard({ grant, onRevoke }: { grant: Grant; onRevoke: () => void }) 
         onClick={onRevoke}
         className="mt-3 min-h-11 w-full rounded-2xl border border-border text-sm font-semibold text-destructive transition-colors hover:bg-destructive-soft"
       >
-        Retirar su acceso
+        {copy('Retirar su acceso')}
       </button>
     </div>
   )
