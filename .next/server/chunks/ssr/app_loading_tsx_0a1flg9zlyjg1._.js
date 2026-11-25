@@ -1,3 +1,0 @@
-module.exports=[63588,a=>{"use strict";var b=a.i(88024);a.s(["default",0,function(){return(0,b.jsxs)("div",{className:"h-full space-y-4 p-5",role:"status","aria-label":"Cargando",children:[(0,b.jsx)("div",{className:"h-10 w-24 animate-pulse rounded-xl bg-muted"}),(0,b.jsx)("div",{className:"h-10 w-3/4 animate-pulse rounded-xl bg-muted"}),(0,b.jsx)("div",{className:"h-40 animate-pulse rounded-3xl bg-muted/70"}),(0,b.jsx)("div",{className:"h-28 animate-pulse rounded-3xl bg-muted/70"}),(0,b.jsx)("span",{className:"sr-only",children:"Cargando…"})]})}])},45538,function(a){a.n(a.i(63588))}];
-
-//# sourceMappingURL=app_loading_tsx_0a1flg9zlyjg1._.js.map
