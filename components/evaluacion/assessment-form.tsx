@@ -9,6 +9,7 @@ import { ReviewStep } from '@/components/evaluacion/review-step'
 import { computeScore, hasAnyNetwork, useIdentity, type Answers } from '@/lib/identity-store'
 import { getLevel, toneStyles } from '@/lib/score'
 import { cn } from '@/lib/utils'
+import { useIsV3 } from '@/lib/prototype-context'
 
 type Option<V extends string> = { value: V; label: string; hint?: string }
 
@@ -50,6 +51,7 @@ export function AssessmentForm() {
   return (
     <div className="px-5">
       <div ref={topRef} tabIndex={-1} className="scroll-mt-20 outline-none">
+        {useIsV3() ? <p role="status" className="mb-3 flex items-center gap-1.5 text-xs font-medium text-success"><Check className="size-3.5" aria-hidden="true" />Guardado automático</p> : null}
         <div className="flex items-baseline justify-between text-sm">
           <p className="font-semibold">
             Paso {step + 1} de {STEPS.length}
@@ -487,6 +489,7 @@ function Segmented<V extends string>({
   detected?: string
 }) {
   const labelId = `${name}-label`
+  const isV3 = useIsV3()
   return (
     <div role="radiogroup" aria-labelledby={labelId}>
       <div className={cn('mb-2 flex items-center justify-between gap-2', hideLabel && 'sr-only')}>
@@ -500,11 +503,11 @@ function Segmented<V extends string>({
           </span>
         ) : null}
       </div>
-      <div className="grid auto-cols-fr grid-flow-col gap-1 rounded-2xl bg-muted p-1">
+      <div className={cn('grid auto-cols-fr grid-flow-col gap-1 rounded-2xl p-1', isV3 ? 'bg-card ring-1 ring-border' : 'bg-muted')}>
         {options.map((option) => (
           <label
             key={option.value}
-            className="relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 text-sm font-medium text-muted-foreground transition-all has-checked:bg-card has-checked:font-semibold has-checked:text-foreground has-checked:shadow-sm has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+            className={cn('relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-2 text-sm font-medium transition-all has-checked:font-semibold has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'text-foreground has-checked:bg-primary has-checked:text-primary-foreground' : 'text-muted-foreground has-checked:bg-card has-checked:text-foreground has-checked:shadow-sm')}
           >
             <input
               type="radio"
@@ -533,12 +536,13 @@ function ChoiceList<V extends string>({
   value: V
   onChange: (value: V) => void
 }) {
+  const isV3 = useIsV3()
   return (
     <div className="flex flex-col gap-2">
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-checked:bg-primary/[0.04] has-focus-visible:ring-3 has-focus-visible:ring-ring/50"
+          className={cn('relative flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors has-checked:border-primary has-focus-visible:ring-3 has-focus-visible:ring-ring/50', isV3 ? 'has-checked:bg-primary/10' : 'has-checked:bg-primary/[0.04]')}
         >
           <input
             type="radio"

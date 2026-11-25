@@ -21,10 +21,13 @@ import {
 } from '@/lib/circle'
 import { useIdentity } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototype } from '@/lib/prototype-context'
 
 export function CircleHome() {
   const { state, update } = useIdentity()
+  const isV3 = usePrototype().version === 'v3'
   const [inviting, setInviting] = useState(false)
+  const [pendingRevoke, setPendingRevoke] = useState<Grant | null>(null)
   const { members, incoming, grants } = state.circle
 
   const accept = (request: IncomingRequest) =>
@@ -109,7 +112,10 @@ export function CircleHome() {
           <ul className="grid gap-3 px-5 lg:grid-cols-2">
             {grants.map((grant) => (
               <li key={grant.id}>
-                <GrantCard grant={grant} onRevoke={() => revoke(grant.id)} />
+                <GrantCard grant={grant} onRevoke={() => {
+                  if (isV3) setPendingRevoke(grant)
+                  else revoke(grant.id)
+                }} />
               </li>
             ))}
           </ul>
@@ -123,6 +129,18 @@ export function CircleHome() {
       </section>
 
       <InviteSheet open={inviting} onClose={() => setInviting(false)} />
+      {pendingRevoke ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingRevoke(null) }}>
+          <section role="alertdialog" aria-modal="true" aria-labelledby="revoke-title" aria-describedby="revoke-description" className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+            <h2 id="revoke-title" className="text-xl font-semibold">¿Retirar el acceso?</h2>
+            <p id="revoke-description" className="mt-2 text-sm leading-relaxed text-muted-foreground">{pendingRevoke.name} dejará de ver la información que compartes. Puedes volver a invitarle más adelante.</p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button id="revoke-cancel" type="button" autoFocus onClick={() => setPendingRevoke(null)} className="min-h-11 rounded-xl border border-border bg-card px-4 text-sm font-semibold">Cancelar</button>
+              <button type="button" onClick={() => { revoke(pendingRevoke.id); setPendingRevoke(null) }} className="min-h-11 rounded-xl bg-destructive px-4 text-sm font-semibold text-white">Retirar acceso</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   )
 }

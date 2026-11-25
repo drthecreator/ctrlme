@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePrototype } from '@/lib/prototype-context'
 
 type ScreenProps = {
   children: React.ReactNode
@@ -25,6 +28,16 @@ type ScreenHeaderProps = {
 }
 
 export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderProps) {
+  const { version, language } = usePrototype()
+  const v3 = version === 'v3'
+  const displayedTitle = v3 && title === 'Plan para subir'
+    ? language === 'en' ? 'Improve your score' : 'Mejora tu puntuación'
+    : v3 && title === 'Guías rápidas'
+      ? language === 'en' ? 'Guides' : 'Guías'
+      : title
+  const displayedSubtitle = v3 && title === 'Guías rápidas'
+    ? language === 'en' ? 'Learn in 1 minute' : 'Aprende en 1 minuto'
+    : subtitle
   return (
     <>
       <div className="sticky top-0 z-10 bg-background px-3 pt-[max(env(safe-area-inset-top),0.75rem)] pb-1 lg:pt-3">
@@ -33,16 +46,16 @@ export function ScreenHeader({ title, subtitle, backHref = '/' }: ScreenHeaderPr
           className="inline-flex min-h-12 items-center gap-1 rounded-xl pr-3 pl-1.5 text-[0.9375rem] font-medium text-primary transition-colors hover:bg-muted"
         >
           <ChevronLeft className="size-5" aria-hidden="true" />
-          Volver
+          {v3 && language === 'en' ? 'Back' : 'Volver'}
         </Link>
       </div>
       <header className="px-5 pt-1 pb-5">
         <h1 tabIndex={-1} className="font-serif text-[2.25rem] leading-[1.05] tracking-tight text-balance lg:text-[2.75rem]">
-          {title}
+          {displayedTitle}
         </h1>
-        {subtitle ? (
+        {displayedSubtitle ? (
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground lg:text-base">
-            {subtitle}
+            {displayedSubtitle}
           </p>
         ) : null}
       </header>

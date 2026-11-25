@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button'
 import { formatDuration, type Pill } from '@/lib/guides'
 import { PillGlyph } from '@/components/guias/pill-visuals'
 import { cn } from '@/lib/utils'
+import { useIsV3 } from '@/lib/prototype-context'
 
 const WORDS_PER_SECOND = 2.6
 
 export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () => void }) {
+  const isV3 = useIsV3()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(true)
@@ -129,7 +131,7 @@ export function StoryViewer({ pill, onClose }: { pill: Pill | null; onClose: () 
               variant="ghost"
               size="icon-lg"
               onClick={onClose}
-              className="size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              className={cn('size-11 rounded-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground', isV3 && 'border border-primary-foreground/40 bg-primary-foreground/15')}
               aria-label="Cerrar historia"
             >
               <X className="size-5" aria-hidden="true" />

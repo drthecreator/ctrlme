@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useIsV3 } from '@/lib/prototype-context'
 import { ArrowRight, Briefcase, MapPin, Share2, UserRound, type LucideIcon } from 'lucide-react'
 import { BottomSheet } from '@/components/bottom-sheet'
 import { buttonVariants } from '@/components/ui/button'
@@ -113,6 +114,7 @@ function buildCategories(email: string): Category[] {
 
 export function CategoryGrid() {
   const { state } = useIdentity()
+  const isV3 = useIsV3()
   const [openId, setOpenId] = useState<string | null>(null)
   const categories = buildCategories(state.identity.emails[0]?.address ?? 'tu correo')
   const current = categories.find((category) => category.id === openId) ?? null
@@ -144,7 +146,7 @@ export function CategoryGrid() {
       </ul>
 
       <BottomSheet open={current !== null} onClose={() => setOpenId(null)} title={current?.title ?? ''}>
-        {current ? <CategoryDetail category={current} /> : null}
+        {current ? <CategoryDetail category={current} isV3={isV3} /> : null}
       </BottomSheet>
     </>
   )
@@ -165,7 +167,7 @@ function ExposureBadge({ exposure }: { exposure: { label: string; tone: Tone } }
   )
 }
 
-function CategoryDetail({ category }: { category: Category }) {
+function CategoryDetail({ category, isV3 }: { category: Category; isV3: boolean }) {
   return (
     <div>
       <div className="flex items-center gap-4 rounded-3xl bg-card p-4 shadow-xs ring-1 ring-border">
@@ -199,7 +201,7 @@ function CategoryDetail({ category }: { category: Category }) {
       <h3 className="mt-6 mb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase">Qué puedes hacer</h3>
       <ol className="flex flex-col gap-2">
         {category.advice.map((tip, index) => (
-          <li key={tip} className="flex gap-3 rounded-2xl bg-secondary/60 p-3.5 text-[0.9375rem] leading-snug">
+          <li key={tip} className={cn('flex gap-3 rounded-2xl p-3.5 text-[0.9375rem] leading-snug', isV3 ? 'bg-background ring-1 ring-border' : 'bg-secondary/60')}>
             <span
               className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
               aria-hidden="true"

@@ -22,6 +22,7 @@ import { fieldClass } from '@/components/onboarding/onboarding-flow'
 import { initials } from '@/lib/circle'
 import { defaultAlertPrefs, useIdentity, type AlertPrefs } from '@/lib/identity-store'
 import { cn } from '@/lib/utils'
+import { usePrototype } from '@/lib/prototype-context'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -29,6 +30,8 @@ export function ProfileSettings() {
   const id = useId()
   const router = useRouter()
   const { state, update, reset } = useIdentity()
+  const prototype = usePrototype()
+  const isV3 = prototype.version === 'v3'
   const { identity } = state
   const [adding, setAdding] = useState(false)
   const [newEmail, setNewEmail] = useState('')
@@ -86,6 +89,44 @@ export function ProfileSettings() {
         </span>
         <ChevronRight className="size-5 text-muted-foreground" aria-hidden="true" />
       </Link>
+
+      {isV3 ? (
+        <Group title={prototype.language === 'en' ? 'Accessibility' : 'Accesibilidad'} hint={prototype.language === 'en' ? 'Your preferences are saved on this device.' : 'Tus preferencias se guardan en este dispositivo.'}>
+          <div className="flex flex-col gap-4 p-4">
+  <div className="flex flex-col gap-2">
+  <label htmlFor="prototype-language" className="text-sm font-semibold">Idioma / Language</label>
+  <select id="prototype-language" value={prototype.language} onChange={(event) => prototype.setLanguage(event.target.value as 'es' | 'en')} className="min-h-11 rounded-xl border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring">
+  <option value="es">Español</option>
+  <option value="en">English</option>
+  </select>
+  </div>
+            <fieldset>
+              <legend className="text-sm font-semibold">{prototype.language === 'en' ? 'Appearance' : 'Apariencia'}</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {(['light', 'dark'] as const).map((theme) => (
+                  <button key={theme} type="button" aria-pressed={prototype.theme === theme} onClick={() => prototype.setTheme(theme)} className={cn('min-h-11 rounded-xl border px-3 text-sm font-semibold', prototype.theme === theme ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
+                    {theme === 'light' ? (prototype.language === 'en' ? 'Light' : 'Claro') : (prototype.language === 'en' ? 'Dark' : 'Oscuro')}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend className="text-sm font-semibold">{prototype.language === 'en' ? 'Text size' : 'Tamaño del texto'}</legend>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {([100, 125, 150] as const).map((scale) => (
+                  <button key={scale} type="button" aria-pressed={prototype.fontScale === scale} onClick={() => prototype.setFontScale(scale)} className={cn('min-h-11 rounded-xl border px-2 text-sm font-semibold', prototype.fontScale === scale ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
+                    {scale === 100 ? (prototype.language === 'en' ? 'Normal' : 'Normal') : `${scale}%`}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <label className="flex min-h-12 items-center justify-between gap-3 text-sm font-semibold">
+              {prototype.language === 'en' ? 'High contrast' : 'Alto contraste'}
+              <Switch checked={prototype.contrast === 'high'} onCheckedChange={(checked) => prototype.setContrast(checked ? 'high' : 'normal')} aria-label="Activar alto contraste" />
+            </label>
+          </div>
+        </Group>
+      ) : null}
 
       <Group title="Datos vigilados" hint="Los buscamos en filtraciones y fuentes públicas.">
         {identity.emails.map((email) => (
@@ -273,21 +314,23 @@ export function ProfileSettings() {
           Guardamos solo los datos que ves aquí, cifrados. Puedes borrarlos cuando quieras.
         </p>
         {confirmDelete ? (
-          <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label="Confirmar eliminación">
-            <Button variant="ghost" size="touch-sm" onClick={() => setConfirmDelete(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              size="touch-sm"
-              onClick={() => {
-                reset()
-                router.push('/')
-              }}
-            >
-              Sí, borrar todo
-            </Button>
-          </div>
+          isV3 ? (
+            <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4">
+              <section role="alertdialog" aria-modal="true" aria-labelledby={`${id}-delete-title`} aria-describedby={`${id}-delete-description`} className="w-full max-w-md rounded-3xl border border-border bg-background p-6 text-foreground shadow-2xl">
+                <h2 id={`${id}-delete-title`} className="text-xl font-semibold">Borrar todos tus datos</h2>
+                <p id={`${id}-delete-description`} className="mt-2 text-sm leading-relaxed text-muted-foreground">Esta acción no se puede deshacer. Se eliminarán tu perfil, preferencias y acciones guardadas.</p>
+                <div className="mt-6 flex justify-end gap-2">
+                  <Button variant="outline" size="touch-sm" autoFocus onClick={() => setConfirmDelete(false)}>Cancelar</Button>
+                  <Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>Sí, borrar todo</Button>
+                </div>
+              </section>
+            </div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label="Confirmar eliminación">
+              <Button variant="ghost" size="touch-sm" onClick={() => setConfirmDelete(false)}>Cancelar</Button>
+              <Button variant="destructive" size="touch-sm" onClick={() => { reset(); router.push('/') }}>Sí, borrar todo</Button>
+            </div>
+          )
         ) : (
           <Button variant="destructive" size="touch-sm" className="mt-3 w-full" onClick={() => setConfirmDelete(true)}>
             <Trash2 aria-hidden="true" />

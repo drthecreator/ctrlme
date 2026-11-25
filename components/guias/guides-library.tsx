@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useIsV3, usePrototype } from '@/lib/prototype-context'
 import { Play } from 'lucide-react'
 import { featuredPills, formatDuration, pillCategories, pills, type Pill, type PillCategory } from '@/lib/guides'
 import { StoryViewer } from '@/components/guias/story-viewer'
@@ -12,6 +13,8 @@ type Filter = 'todas' | PillCategory
 const categoryLabel = Object.fromEntries(pillCategories.map((c) => [c.id, c.label])) as Record<PillCategory, string>
 
 export function GuidesLibrary() {
+  const isV3 = useIsV3()
+  const { language } = usePrototype()
   const [openPill, setOpenPill] = useState<Pill | null>(null)
   const [filter, setFilter] = useState<Filter>('todas')
 
@@ -21,7 +24,7 @@ export function GuidesLibrary() {
     <>
       <section aria-labelledby="empezar-title">
         <h2 id="empezar-title" className="mb-3 px-5 text-lg font-semibold tracking-tight">
-          Para empezar
+          {isV3 && language === 'en' ? 'Start here' : 'Para empezar'}
         </h2>
         <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {featuredPills.map((pill) => (
@@ -29,7 +32,7 @@ export function GuidesLibrary() {
               <article className="surface flex h-full flex-col overflow-hidden rounded-3xl">
                 <div
                   aria-hidden="true"
-                  className={cn('relative flex h-40 items-center justify-center overflow-hidden', categoryTone[pill.category])}
+                  className={cn('relative flex h-40 items-center justify-center overflow-hidden', isV3 ? 'bg-secondary text-secondary-foreground ring-1 ring-border' : categoryTone[pill.category])}
                 >
                   <span className="absolute -bottom-10 -left-10 size-40 rounded-full border border-current opacity-15" />
                   <span className="absolute -top-12 -right-6 size-32 rounded-full border border-current opacity-15" />
@@ -92,7 +95,7 @@ export function GuidesLibrary() {
               >
                 <span
                   aria-hidden="true"
-                  className={cn('relative flex h-28 w-full items-center justify-center overflow-hidden', categoryTone[pill.category])}
+                  className={cn('relative flex h-28 w-full items-center justify-center overflow-hidden', isV3 ? 'bg-secondary text-secondary-foreground ring-1 ring-border' : categoryTone[pill.category])}
                 >
                   <span className="absolute -right-6 -bottom-8 size-24 rounded-full border border-current opacity-20" />
                   <PillGlyph name={pill.icon} className="size-11" />
