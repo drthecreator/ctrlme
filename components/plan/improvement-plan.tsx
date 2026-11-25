@@ -6,12 +6,14 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { computeScore, getPlan, useIdentity } from '@/lib/identity-store'
 import { getLevel, toneStyles } from '@/lib/score'
 import { cn } from '@/lib/utils'
-import { useIsV3 } from '@/lib/prototype-context'
+import { localize, usePrototype } from '@/lib/prototype-context'
 import { useEffect, useMemo, useState } from 'react'
 
 export function ImprovementPlan() {
   const { state, update } = useIdentity()
-  const isV3 = useIsV3()
+  const { version, language } = usePrototype()
+  const isV3 = version === 'v3'
+  const copy = (text: string) => isV3 ? localize(text, language) : text
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all')
   const [sort, setSort] = useState<'high' | 'low'>('high')
   const [completedItems, setCompletedItems] = useState<ReturnType<typeof getPlan>>([])
@@ -36,26 +38,26 @@ export function ImprovementPlan() {
 
   return (
     <div className="px-5">
-      <section aria-label="Progreso posible" className="surface flex items-center gap-4 rounded-3xl p-5">
-        <ScoreBlock label="Ahora" score={total} levelLabel={currentLevel.label} tone={currentLevel.tone} />
+      <section aria-label={copy('Progreso posible')} className="surface flex items-center gap-4 rounded-3xl p-5">
+        <ScoreBlock label={copy('Ahora')} score={total} levelLabel={currentLevel.label} tone={currentLevel.tone} />
         <ArrowRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <ScoreBlock label="Si completas el plan" score={potential} levelLabel={potentialLevel.label} tone={potentialLevel.tone} />
+        <ScoreBlock label={copy('Si completas el plan')} score={potential} levelLabel={potentialLevel.label} tone={potentialLevel.tone} />
       </section>
 
       {isV3 ? (
-        <section aria-label="Filtrar y ordenar acciones" className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3">
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Estado de las acciones">
+        <section aria-label={copy('Filtrar y ordenar acciones')} className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3">
+          <div className="flex flex-wrap gap-2" role="group" aria-label={copy('Estado de las acciones')}>
             {([['all', 'Todas'], ['pending', 'Pendientes'], ['completed', 'Completadas']] as const).map(([value, label]) => (
               <button key={value} type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} className={cn('min-h-10 rounded-full border px-3 text-sm font-medium transition-colors', filter === value ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background text-foreground hover:bg-muted')}>
-                {label}
+                {copy(label)}
               </button>
             ))}
           </div>
           <label className="flex items-center justify-between gap-3 text-sm font-medium" htmlFor="plan-sort">
-            Ordenar por impacto
+            {copy('Ordenar por impacto')}
             <select id="plan-sort" value={sort} onChange={(event) => setSort(event.target.value as 'high' | 'low')} className="min-h-11 max-w-48 rounded-xl border border-input bg-background px-3 text-sm text-foreground">
-              <option value="high">Mayor impacto</option>
-              <option value="low">Menor impacto</option>
+              <option value="high">{copy('Mayor impacto')}</option>
+              <option value="low">{copy('Menor impacto')}</option>
             </select>
           </label>
         </section>
@@ -73,11 +75,11 @@ export function ImprovementPlan() {
         </div>
       ) : visibleItems.length === 0 ? (
         <div className="surface mt-4 rounded-3xl p-6 text-center" role="status">
-          <h2 className="font-semibold">{filter === 'completed' ? 'Aún no hay acciones completadas' : 'No hay acciones pendientes'}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Tus cambios aparecerán aquí.</p>
+          <h2 className="font-semibold">{copy(filter === 'completed' ? 'Aún no hay acciones completadas' : 'No hay acciones pendientes')}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{copy('Tus cambios aparecerán aquí.')}</p>
         </div>
       ) : (
-        <ol className="mt-4 flex flex-col gap-3" aria-label="Acciones recomendadas">
+        <ol className="mt-4 flex flex-col gap-3" aria-label={copy('Acciones recomendadas')}>
           {(isV3 ? visibleItems : plan).map((item, index) => {
             const isCompleted = completedIds.has(item.id) && !plan.some((pending) => pending.id === item.id)
             return (
@@ -90,7 +92,7 @@ export function ImprovementPlan() {
                     <h2 className="text-[0.9375rem] leading-snug font-semibold text-balance">{item.title}</h2>
                     <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{item.description}</p>
                   </div>
-                  {isCompleted ? <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-semibold text-success">Completada</span> : (
+                  {isCompleted ? <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-semibold text-success">{copy('Completada')}</span> : (
                     <span className="shrink-0 rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success tabular-nums">+{item.gain}<span className="sr-only"> puntos</span></span>
                   )}
                 </div>
@@ -106,7 +108,7 @@ export function ImprovementPlan() {
                         if (isV3) setCompletedItems((items) => items.some((done) => done.id === item.id) ? items : [item, ...items])
                         update(item.selfFix!)
                       }}>
-                        <Check aria-hidden="true" />Ya lo hice<span className="sr-only">: {item.title}</span>
+                        <Check aria-hidden="true" />{copy('Ya lo hice')}<span className="sr-only">: {item.title}</span>
                       </Button>
                     ) : null}
                   </div>

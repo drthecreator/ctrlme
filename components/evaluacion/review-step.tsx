@@ -1,6 +1,7 @@
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Answers, Often } from '@/lib/identity-store'
+import { localize, usePrototype } from '@/lib/prototype-context'
 
 const often: Record<Often, string> = { nunca: 'Nunca', 'a-veces': 'A veces', 'a-menudo': 'A menudo' }
 const yesNo = { si: 'Sí', no: 'No' }
@@ -81,27 +82,29 @@ function buildGroups(a: Answers): Group[] {
 }
 
 export function ReviewStep({ answers, onEdit }: { answers: Answers; onEdit: (step: number) => void }) {
+  const { version, language } = usePrototype()
+  const copy = (text: string) => version === 'v3' ? localize(text, language) : text
   return (
     <div className="mt-5">
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Comprueba tus respuestas antes de calcular la puntuación. Puedes cambiar cualquier apartado.
+        {copy('Comprueba tus respuestas antes de calcular la puntuación. Puedes cambiar cualquier apartado.')}
       </p>
       <div className="mt-4 flex flex-col gap-3">
         {buildGroups(answers).map((group) => (
-          <section key={group.title} aria-label={group.title} className="surface rounded-3xl p-4">
+          <section key={group.title} aria-label={copy(group.title)} className="surface rounded-3xl p-4">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-[0.9375rem] font-semibold">{group.title}</h3>
+              <h3 className="text-[0.9375rem] font-semibold">{copy(group.title)}</h3>
               <Button variant="ghost" size="touch-sm" onClick={() => onEdit(group.step)}>
                 <Pencil aria-hidden="true" />
-                Editar
-                <span className="sr-only"> {group.title}</span>
+                {copy('Editar')}
+                <span className="sr-only"> {copy(group.title)}</span>
               </Button>
             </div>
             <dl className="mt-1 divide-y divide-border/60">
               {group.rows.map((row) => (
                 <div key={row.label} className="flex items-baseline justify-between gap-4 py-2 text-sm">
-                  <dt className="text-muted-foreground">{row.label}</dt>
-                  <dd className="text-right font-medium">{row.value}</dd>
+                  <dt className="text-muted-foreground">{copy(row.label)}</dt>
+                  <dd className="text-right font-medium">{copy(row.value)}</dd>
                 </div>
               ))}
             </dl>

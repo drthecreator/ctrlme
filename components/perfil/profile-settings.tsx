@@ -115,7 +115,7 @@ export function ProfileSettings() {
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {([100, 125, 150] as const).map((scale) => (
                   <button key={scale} type="button" aria-pressed={prototype.fontScale === scale} onClick={() => prototype.setFontScale(scale)} className={cn('min-h-11 rounded-xl border px-2 text-sm font-semibold', prototype.fontScale === scale ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card')}>
-                    {scale === 100 ? (prototype.language === 'en' ? 'Normal' : 'Normal') : `${scale}%`}
+                    {`${scale}%`}
                   </button>
                 ))}
               </div>
