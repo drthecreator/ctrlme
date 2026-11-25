@@ -20,7 +20,7 @@
 
 En este apartado se presentan las pantallas principales del prototipo final \textbf{Ctrl+Me v3.0}, desarrollado como evolución directa de la versión v2.0 tras integrar las críticas recibidas por parte de los compañeros, las correcciones detectadas con los validadores automáticos (\textit{Colour Contrast Analyser} y \textit{WAVE}) y el conjunto de nuevos requisitos de usabilidad y accesibilidad recogidos en las Tablas~\ref{tab:requisitos-usabilidad} y~\ref{tab:requisitos-accesibilidad}.
 
-Con el objetivo de facilitar la comparación directa entre ambas iteraciones sin duplicar componentes ni pantallas, la aplicación implementa un selector de versión en la pantalla inicial de bienvenida (Figura~\ref{fig:v3-selector-version}) que permite escoger entre \textit{Prototipo v1.0 \& v2.0} y \textit{Prototipo v3.0}. Una vez elegida la versión y superada la bienvenida, el selector desaparece de las pantallas interiores para evitar ruido visual o solapamientos; únicamente se vuelve a mostrar si la persona usuaria regresa a la pantalla de bienvenida (por ejemplo, tras restablecer o borrar sus datos). En \textit{v2.0} se conserva intacto el comportamiento previo, mientras que en \textit{v3.0} se activan todas las mejoras descritas a continuación.
+Con el objetivo de facilitar la comparación directa entre ambas iteraciones sin duplicar código ni vistas, la aplicación incorpora un selector de versión en la pantalla inicial de bienvenida (Figura~\ref{fig:v3-selector-version}) para escoger entre \textit{Prototipo v1.0 \& v2.0} y \textit{Prototipo v3.0}. Una vez seleccionada la versión y superada la bienvenida, el selector desaparece de todas las pantallas interiores para evitar ruido visual y únicamente vuelve a mostrarse al regresar a la pantalla de bienvenida. En \textit{v2.0} se mantiene intacto el diseño anterior, mientras que en \textit{v3.0} se activan las mejoras detalladas a continuación.
 
 \begin{figure}[H]
   \centering
@@ -34,21 +34,21 @@ Con el objetivo de facilitar la comparación directa entre ambas iteraciones sin
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_bienvenida_es_web.png}
-    \caption{Bienvenida v3.0 con selector en barra superior}
+    \caption{Bienvenida v3.0 con selector e idioma en barra superior}
     \label{fig:v3-bienvenida-es}
   \end{subfigure}
   \caption{Selector de prototipo en la pantalla de bienvenida (v3.0).}
   \label{fig:v3-selector-version}
 \end{figure}
 
-\subsection{Pantalla principal y reducción de la densidad visual}
+\subsection{Pantalla principal, consistencia visual y reducción de densidad}
 
-La pantalla principal (\textit{Tu resumen}, Figura~\ref{fig:v3-principal}) concentra los cambios orientados a mejorar la claridad semántica y reducir la carga cognitiva en usuarios novatos, dando respuesta directa a los requisitos \textbf{R-USA-1}, \textbf{R-USA-2}, \textbf{R-USA-3} de la Tabla~\ref{tab:requisitos-usabilidad}, al requisito \textbf{R-ACC-2} de la Tabla~\ref{tab:requisitos-accesibilidad} y a los hallazgos de los validadores automáticos:
+La pantalla principal (\textit{Tu resumen}, Figura~\ref{fig:v3-principal}) junto a las vistas de mejora y aprendizaje (Figura~\ref{fig:v3-plan-guias}) materializan los requisitos \textbf{R-USA-1}, \textbf{R-USA-2}, \textbf{R-USA-3}, \textbf{R-USA-4} (Tabla~\ref{tab:requisitos-usabilidad}), \textbf{R-ACC-2} (Tabla~\ref{tab:requisitos-accesibilidad}) y los hallazgos de \textit{Colour Contrast Analyser} y \textit{WAVE}:
 
 \begin{itemize}
-  \item \textbf{Etiquetas inequívocas en el medidor de puntuación (R-USA-1):} Se sustituyeron los calificativos genéricos \textit{Bajo}, \textit{Medio} y \textit{Alto} del arco central y de la leyenda inferior por \textbf{Protección escasa} (0--59), \textbf{Protección media} (60--84) y \textbf{Protección excelente} (85--100). De este modo se elimina cualquier ambigüedad frente a las etiquetas de \textit{Exposición baja / media / alta} mostradas dentro de \textit{Ver mi huella digital}. Además, atendiendo al análisis de \textit{Colour Contrast Analyser}, se eliminó la opacidad atenuada sobre los rangos numéricos de la leyenda para garantizar un contraste completo.
-  \item \textbf{Reducción de densidad visual y acceso unificado (R-USA-2, R-USA-3):} Se eliminaron de la pantalla principal las tarjetas resumen de \textit{Limpiar cuentas}, \textit{Alertas de filtraciones} y la tarjeta inferior de \textit{Tu plan para subir}, ya que las dos primeras ya se encuentran accesibles de forma permanente desde la barra de navegación. En su lugar, la acción \textbf{Mejora tu puntuación} (renombrada desde \textit{Plan para subir}) se integra como botón principal junto a \textbf{Ver mi huella digital} dentro del contenedor de puntuación, adaptándose en una cuadrícula fluida en móvil para evitar desbordamientos.
-  \item \textbf{Estructura semántica y contraste en textos secundarios (R-ACC-2, WAVE):} En la vista de escritorio se sustituyó el contenedor del encabezado por un elemento semántico \texttt{<header>} que aloja el título \textit{Tu resumen} (corrigiendo el aviso detectado por \textit{WAVE}) y se oscurecieron los textos secundarios (\texttt{--muted-foreground}), como las marcas temporales (\textit{«hace un momento»}) y descripciones breves. Asimismo, en dispositivos móviles y tabletas se eliminó el marco simulado de teléfono para aprovechar el 100\,\% del ancho disponible.
+  \item \textbf{Etiquetas inequívocas en el medidor (R-USA-1):} Se sustituyeron los calificativos genéricos \textit{Bajo}, \textit{Medio} y \textit{Alto} del arco central y su leyenda inferior por \textbf{Protección escasa} (0--59), \textbf{Protección media} (60--84) y \textbf{Protección excelente} (85--100), evitando ambigüedades con la escala de \textit{Exposición} de \textit{Tu huella digital}. Asimismo, se eliminó la atenuación de opacidad en la leyenda numérica para asegurar un contraste óptimo.
+  \item \textbf{Menor densidad visual y acceso unificado (R-USA-2, R-USA-3):} Se eliminaron de la pantalla principal las tarjetas redundantes de \textit{Limpiar cuentas}, \textit{Alertas de filtraciones} y \textit{Tu plan para subir}. La acción \textbf{Mejora tu puntuación} (renombrada de forma consistente en botones, menú y cabecera) pasa a mostrarse dentro del contenedor de puntuación junto a \textbf{Ver mi huella digital}, adaptándose sin desbordamientos al 100\,\% del ancho en móvil incluso al escalar el texto al 150\,\%.
+  \item \textbf{Filtrado, ordenación y coherencia cromática (R-USA-4, CCA/WAVE):} En \textit{Mejora tu puntuación} se añadieron los filtros \textbf{Todas}, \textbf{Pendientes} y \textbf{Completadas} junto al selector de ordenación por impacto. En \textit{Guías} se unificó el título \texttt{<h1>} (\textit{Guías}), se dejó \textit{Aprende en 1 minuto} como subtítulo, se reforzó el contraste de las píldoras educativas, se añadió un elemento semántico \texttt{<header>} en escritorio y se oscurecieron los textos secundarios (\texttt{--muted-foreground}).
 \end{itemize}
 
 \begin{figure}[H]
@@ -56,93 +56,81 @@ La pantalla principal (\textit{Tu resumen}, Figura~\ref{fig:v3-principal}) conce
   \begin{subfigure}[b]{0.64\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_principal_web.png}
-    \caption{Versión web}
+    \caption{Vista web con estructura \texttt{<header>} y botones integrados}
     \label{fig:v3-principal-web}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.30\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_movil.png}
-    \caption{Versión móvil}
-    \label{fig:v3-principal-movil}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_alto_contraste_150_movil.png}
+    \caption{Vista móvil (Alto contraste y texto 150\,\%)}
+    \label{fig:v3-alto-contraste-150}
   \end{subfigure}
-  \caption{Pantalla principal de Ctrl+Me (v3.0) con etiquetas de protección inequívocas y menor densidad visual.}
+  \caption{Pantalla principal (v3.0) en escritorio y móvil con escalado accesible sin desbordamientos.}
   \label{fig:v3-principal}
 \end{figure}
 
-\subsection{Mejora tu puntuación, Guías y consistencia visual}
-
-En las pantallas de mejora y aprendizaje se unificaron los títulos y los estados visuales de los controles interactivos (Figura~\ref{fig:v3-plan-guias}):
-
-\begin{itemize}
-  \item \textbf{Consistencia en títulos (R-USA-2):} Toda referencia a \textit{Plan para subir} —tanto en los botones de inicio, el menú de perfil móvil y la cabecera de la vista— pasa a denominarse \textbf{Mejora tu puntuación}. Igualmente, la sección de aprendizaje adopta \textbf{Guías} como encabezado principal (\texttt{<h1>}) y mantiene \textbf{Aprende en 1 minuto} como subtítulo explicativo, alineándose con el enlace del menú lateral.
-  \item \textbf{Filtrado por estado y ordenación por impacto (R-USA-4):} Sobre la lista de acciones recomendadas de \textit{Mejora tu puntuación} se añadieron los filtros por estado (\textbf{Todas}, \textbf{Pendientes}, \textbf{Completadas}) y un desplegable de ordenación por impacto en puntos (\textbf{Mayor impacto} / \textbf{Menor impacto}). Al completar una acción con \textit{Ya lo hice}, la puntuación potencial se recalcula en tiempo real y la tarea pasa al estado \textit{Completada}.
-  \item \textbf{Correcciones de contraste en botones y píldoras (Validadores CCA):} Siguiendo los resultados de \textit{Colour Contrast Analyser}, todas las acciones pendientes con enlace (incluido \textit{Revisar permisos}) comparten el mismo estilo delimitado, mientras que los botones \textit{Ya lo hice} adoptan un estilo verde coherente con el distintivo de tareas completadas. En \textit{Guías}, las cabeceras de tarjetas verdes y beige se reemplazaron por tonos de alto contraste que garantizan la legibilidad respecto al fondo blanco y oscuro.
-\end{itemize}
-
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.64\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_mejora_puntuacion_web.png}
-    \caption{Mejora tu puntuación (web) con filtros y ordenación}
+    \caption{Mejora tu puntuación con filtros y ordenación}
     \label{fig:v3-plan-web}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.30\textwidth}
+  \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_mejora_puntuacion_movil.png}
-    \caption{Mejora tu puntuación (móvil)}
-    \label{fig:v3-plan-movil}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_guias_oscuro_web.png}
+    \caption{Guías en modo oscuro con título unificado}
+    \label{fig:v3-guias-oscuro-web}
   \end{subfigure}
-  \caption{Vista \textit{Mejora tu puntuación} (v3.0) con filtrado por estado, ordenación por impacto y coherencia cromática.}
+  \caption{Consistencia en \textit{Mejora tu puntuación} y \textit{Guías} (v3.0), incluyendo tema oscuro.}
   \label{fig:v3-plan-guias}
 \end{figure}
 
-\subsection{Registro, autoguardado y gestión ampliada de errores}
+\subsection{Registro, autoguardado, errores con foco y atajos de teclado}
 
-Para reforzar la robustez y la confianza de la persona usuaria durante la configuración inicial y la evaluación de huella (Figura~\ref{fig:v3-errores-autoguardado}), se incorporaron las mejoras ligadas a los requisitos \textbf{R-USA-7}, \textbf{R-USA-8} y \textbf{R-ACC-1}:
+Para reforzar la robustez ante errores, la confianza durante los cuestionarios y la agilidad con teclado (Figuras~\ref{fig:v3-errores-autoguardado} y~\ref{fig:v3-seguridad-atajos}), se aplicaron los requisitos \textbf{R-USA-5}, \textbf{R-USA-6}, \textbf{R-USA-7}, \textbf{R-USA-8} y \textbf{R-ACC-1}:
 
 \begin{itemize}
-  \item \textbf{Gestión visual ampliada de errores (R-USA-7):} En el paso 2 del registro (\textit{Revisa tu correo}), introducir el código de prueba \texttt{000000} muestra una alerta integrada en rojo con borde marcado, icono de advertencia (\texttt{role="alert"}), descripción clara y bloqueo del botón \textit{Verificar}, junto a las acciones de recuperación (\textit{Reenviar código} y \textit{Cambiar correo}). Adicionalmente, se implementó un aviso superior descartable de fallo de conexión con botón \textbf{Reintentar} (Figura~\ref{fig:v3-error-red}).
-  \item \textbf{Indicador continuo de autoguardado (R-USA-8):} Todos los pasos del cuestionario \textit{Evaluación de huella} incorporan en la barra superior el indicador \textbf{Guardado automático} acompañado de un icono de confirmación, tranquilizando al usuario ante posibles interrupciones. Se unificaron también los estados seleccionado y no seleccionado de los controles tipo radio y segmentados, y se oscurecieron las descripciones auxiliares de las opciones (\textbf{R-ACC-2}).
-  \item \textbf{Selector de idioma en la bienvenida y el registro (R-ACC-1):} El selector compacto \textbf{ES | EN} se sitúa en la esquina superior derecha durante todo el proceso de bienvenida y configuración inicial sin cubrir el indicador \textit{Paso X de 3}.
+  \item \textbf{Gestión de errores y traslado automático de foco (R-USA-7, accesibilidad de formularios):} En el paso 1 del registro, al enviar el formulario con un correo inválido o sin marcar la casilla de autorización, la interfaz muestra el mensaje de error junto al campo y desplaza de inmediato el foco y el indicador visual de enfoque al primer elemento erróneo. En el paso 2, el código \texttt{000000} muestra una alerta roja inline con acciones de recuperación (\textit{Reenviar código} y \textit{Cambiar correo}). Asimismo, ante fallos de conexión se presenta un aviso superior descartable con botón \textbf{Reintentar}.
+  \item \textbf{Autoguardado continuo en evaluación (R-USA-8):} Todos los pasos de \textit{Evaluación de huella} muestran el indicador \textbf{Guardado automático} con confirmación visual y homogeneizan el contraste de controles tipo radio y segmentados.
+  \item \textbf{Atajos de teclado y confirmaciones modales (R-USA-5, R-USA-6):} En escritorio se integran \texttt{Shift+1..5} para cambiar de sección, \texttt{?} para abrir el diálogo renovado de \textbf{Atajos de teclado} desde cualquier pantalla (oculto en móvil para evitar solapamientos) y \texttt{Esc} para cerrar ventanas modales. Las acciones críticas (\textit{Borrar mis datos y cuenta} y \textit{Retirar su acceso}) exigen confirmación en un diálogo modal (\texttt{alertdialog}).
 \end{itemize}
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.30\textwidth}
+  \begin{subfigure}[b]{0.27\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_error_checkbox_movil.png}
+    \caption{Error y traslado de foco al campo pendiente (Paso 1)}
+    \label{fig:v3-error-foco-movil}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.27\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_error_codigo_movil.png}
-    \caption{Error en código de verificación (móvil)}
+    \caption{Error inline de código inválido (Paso 2)}
     \label{fig:v3-error-codigo-movil}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.64\textwidth}
+  \begin{subfigure}[b]{0.42\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_evaluacion_web.png}
-    \caption{Evaluación de huella con indicador de guardado automático (web)}
-    \label{fig:v3-evaluacion-web}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_evaluacion_claro_alto_contraste_web.png}
+    \caption{Evaluación (Alto contraste + autoguardado)}
+    \label{fig:v3-evaluacion-ac-web}
   \end{subfigure}
-  \caption{Gestión visual de errores en verificación de correo y autoguardado continuo en evaluación (v3.0).}
+  \caption{Traslado visible de foco ante errores en registro, validación de código y autoguardado continuo (v3.0).}
   \label{fig:v3-errores-autoguardado}
 \end{figure}
-
-\subsection{Confirmación de acciones sensibles y atajos de teclado}
-
-Con el fin de prevenir acciones irreversibles accidentales y agilizar la navegación en escritorio (Figura~\ref{fig:v3-seguridad-atajos}), se implementaron los requisitos \textbf{R-USA-5} y \textbf{R-USA-6}:
-
-\begin{itemize}
-  \item \textbf{Diálogos modales de confirmación explícita (R-USA-6):} Tanto la acción \textit{Borrar mis datos y cuenta} en \textit{Mi perfil} como \textit{Retirar su acceso} en \textit{Mi círculo} abren un cuadro de diálogo modal (\texttt{role="alertdialog"}) con foco inicial en el botón seguro (\textit{Cancelar}), cierre con \texttt{Esc} y explicación explícita de las consecuencias antes de confirmar la acción.
-  \item \textbf{Atajos de teclado globales y guía modal (R-USA-5):} En escritorio se habilitan los atajos \texttt{Shift+1} a \texttt{Shift+5} para saltar entre las secciones principales (\textit{Principal}, \textit{Limpieza}, \textit{Alertas}, \textit{Guías} y \textit{Mi perfil}), la tecla \texttt{?} para abrir la guía modal de \textbf{Atajos de teclado} desde cualquier vista y \texttt{Esc} para cerrar cualquier modal activo. Los atajos se ignoran automáticamente cuando el foco se encuentra en campos de texto o selectores. En pantallas pequeñas el botón de atajos de la barra lateral se oculta para no sobrecargar la interfaz táctil.
-\end{itemize}
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_atajos_web.png}
-    \caption{Modal de atajos de teclado y navegación estándar}
+    \caption{Modal de atajos de teclado (v3.0)}
     \label{fig:v3-atajos-modal}
   \end{subfigure}
   \hfill
@@ -152,36 +140,35 @@ Con el fin de prevenir acciones irreversibles accidentales y agilizar la navegac
     \caption{Banner de error de conexión con acción \textit{Reintentar}}
     \label{fig:v3-error-red}
   \end{subfigure}
-  \caption{Atajos de teclado globales y recuperación ante errores de red (v3.0).}
+  \caption{Guía modal de atajos de teclado globales y recuperación ante errores de red (v3.0).}
   \label{fig:v3-seguridad-atajos}
 \end{figure}
 
-\subsection{Accesibilidad personalizable: idioma, tema, alto contraste y tamaño de texto}
+\subsection{Accesibilidad personalizable: idioma, tema oscuro y alto contraste}
 
-La nueva sección \textbf{Accesibilidad} dentro de \textit{Mi perfil} (Figura~\ref{fig:v3-accesibilidad}) materializa los requisitos \textbf{R-ACC-1}, \textbf{R-ACC-2} y \textbf{R-ACC-3} de la Tabla~\ref{tab:requisitos-accesibilidad}, ofreciendo cuatro controles independientes persistidos en el dispositivo:
+La sección \textbf{Accesibilidad} dentro de \textit{Mi perfil} (Figura~\ref{fig:v3-accesibilidad}) implementa de manera independiente los requisitos \textbf{R-ACC-1} y \textbf{R-ACC-3} de la Tabla~\ref{tab:requisitos-accesibilidad}, dejando visibles y accesibles los cuatro ajustes persistentes del dispositivo:
 
 \begin{itemize}
-  \item \textbf{Soporte bilingüe completo ES / EN (R-ACC-1):} Un diccionario centralizado traduce de forma íntegra todas las pantallas, etiquetas ARIA, preguntas del cuestionario, plan de mejora, alertas, guías interactivas y respuestas del asistente virtual (Figura~\ref{fig:v3-principal-en}).
-  \item \textbf{Apariencia Claro / Oscuro y modo de Alto Contraste independiente (R-ACC-3):} Mediante variables CSS definidas para las cuatro combinaciones (\textit{Claro + Normal}, \textit{Claro + Alto contraste}, \textit{Oscuro + Normal} y \textit{Oscuro + Alto contraste}), se garantiza que el menú lateral, las tarjetas principales y los diálogos conserven una jerarquía cromática nítida y ratios WCAG~AA/AAA sin pérdida de legibilidad (Figura~\ref{fig:v3-oscuro}).
-  \item \textbf{Escalado tipográfico 100\,\%, 125\,\% y 150\,\% (R-ACC-3):} Al escalar el tamaño raíz mediante unidades \texttt{rem}, los textos, botones y tarjetas se reajustan automáticamente sin desbordamiento horizontal ni recorte de contenido incluso en pantallas móviles estrechas al 150\,\% (Figura~\ref{fig:v3-alto-contraste-150}).
+  \item \textbf{Soporte bilingüe completo ES / EN (R-ACC-1):} Disponible en el selector compacto \textbf{ES | EN} de bienvenida y registro (sin tapar \textit{Paso X de 3}) y mediante el desplegable \textbf{Idioma / Language} en \textit{Mi perfil}, traduciendo por completo navegación, etiquetas ARIA, alertas, limpieza, cuestionario, guías y asistente (Figura~\ref{fig:v3-modos-web}).
+  \item \textbf{Apariencia Claro / Oscuro, Alto contraste y Tamaño de texto (R-ACC-3):} Combinación independiente de \textit{Claro / Oscuro}, interruptor \textbf{Alto contraste} (\textit{High contrast}) y escala tipográfica (\textit{100\,\%, 125\,\%, 150\,\%}) extendida a todas las vistas de la aplicación, preservando la legibilidad de tarjetas críticas como las alertas de filtración en modo oscuro (Figura~\ref{fig:v3-alertas-oscuro-web}).
 \end{itemize}
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}[b]{0.64\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_accesibilidad_web.png}
-    \caption{Sección Accesibilidad en Mi perfil (web)}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_accesibilidad_en_web.png}
+    \caption{Sección Accessibility en inglés con interruptor \textit{High contrast} (web)}
     \label{fig:v3-perfil-acc-web}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.30\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_accesibilidad_movil.png}
-    \caption{Sección Accesibilidad en Mi perfil (móvil)}
-    \label{fig:v3-perfil-acc-movil}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_oscuro_alto_contraste_movil.png}
+    \caption{Oscuro + Alto contraste activado (móvil)}
+    \label{fig:v3-perfil-oscuro-ac-movil}
   \end{subfigure}
-  \caption{Controles independientes de idioma, tema, tamaño de texto y alto contraste en \textit{Mi perfil} (v3.0).}
+  \caption{Controles completos de Accesibilidad en \textit{Mi perfil}: idioma, apariencia, tamaño de texto y alto contraste.}
   \label{fig:v3-accesibilidad}
 \end{figure}
 
@@ -189,43 +176,24 @@ La nueva sección \textbf{Accesibilidad} dentro de \textit{Mi perfil} (Figura~\r
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_oscuro_web.png}
-    \caption{Modo oscuro (Oscuro + Contraste normal)}
-    \label{fig:v3-oscuro}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_principal_en_web.png}
-    \caption{Interfaz completa traducida al inglés (EN)}
+    \caption{Pantalla principal traducida al inglés (EN)}
     \label{fig:v3-principal-en}
   \end{subfigure}
-  \caption{Adaptación visual de \textit{Ctrl+Me v3.0} en modo oscuro e idioma inglés.}
-  \label{fig:v3-modos-web}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
+  \hfill
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_oscuro_alto_contraste_web.png}
-    \caption{Oscuro + Alto contraste (web)}
-    \label{fig:v3-oscuro-ac-web}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_alertas_oscuro_web.png}
+    \caption{Alertas de filtración en modo oscuro}
+    \label{fig:v3-alertas-oscuro-web}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.30\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_alto_contraste_150_movil.png}
-    \caption{Claro + Alto contraste + 150\,\% (móvil)}
-    \label{fig:v3-alto-contraste-150}
-  \end{subfigure}
-  \caption{Combinaciones de alto contraste y escalado tipográfico al 150\,\% sin desbordamientos.}
-  \label{fig:v3-alto-contraste}
+  \caption{Soporte bilingüe completo en inglés y modo oscuro extendido a tarjetas de alerta críticas.}
+  \label{fig:v3-modos-web}
 \end{figure}
 
 \subsection{Relación entre requisitos y cambios efectuados en v3.0}
 
-La Tabla~\ref{tab:trazabilidad-v3} resume la correspondencia exacta entre los requisitos de usabilidad (Tabla~\ref{tab:requisitos-usabilidad}), los requisitos de accesibilidad (Tabla~\ref{tab:requisitos-accesibilidad}) y los ajustes concretos incorporados en las interfaces del prototipo v3.0.
+La Tabla~\ref{tab:trazabilidad-v3} resume la correspondencia directa entre los nuevos requisitos de las Tablas~\ref{tab:requisitos-usabilidad} y~\ref{tab:requisitos-accesibilidad} y los cambios implementados en Ctrl+Me v3.0.
 
 \begin{table}[H]
   \centering
@@ -237,57 +205,57 @@ La Tabla~\ref{tab:trazabilidad-v3} resume la correspondencia exacta entre los re
     \textbf{Requisito (Tabla)} & \textbf{Cambio efectuado en la interfaz v3.0} & \textbf{Evidencia} \\
     \midrule
     R-USA-1 (Tabla~\ref{tab:requisitos-usabilidad}) & Renombrado del arco y leyenda a \textit{Protección escasa / media / excelente} frente a \textit{Exposición baja / media / alta}. & Fig.~\ref{fig:v3-principal} \\
-    R-USA-2 (Tabla~\ref{tab:requisitos-usabilidad}) & Unificación de \textit{Mejora tu puntuación} en enlaces, menú móvil y cabecera; \textit{Guías} como \texttt{h1} y \textit{Aprende en 1 minuto} como subtítulo. & Figs.~\ref{fig:v3-plan-guias}, \ref{fig:v3-anexo-3} \\
-    R-USA-3 (Tabla~\ref{tab:requisitos-usabilidad}) & Eliminación de tarjetas resumen redundantes en Principal y botón \textit{Mejora tu puntuación} junto a \textit{Ver mi huella digital}. & Fig.~\ref{fig:v3-principal} \\
-    R-USA-4 (Tabla~\ref{tab:requisitos-usabilidad}) & Chips de filtro (\textit{Todas / Pendientes / Completadas}) y selector de ordenación por impacto en puntos. & Fig.~\ref{fig:v3-plan-guias} \\
-    R-USA-5 (Tabla~\ref{tab:requisitos-usabilidad}) & Gestor global \texttt{Shift+1..5}, \texttt{?}, \texttt{Esc} (desactivado en campos de entrada) y modal de \textit{Atajos de teclado}. & Fig.~\ref{fig:v3-atajos-modal} \\
-    R-USA-6 (Tabla~\ref{tab:requisitos-usabilidad}) & Diálogos modales \texttt{alertdialog} antes de \textit{Borrar mis datos y cuenta} y \textit{Retirar su acceso}. & Figs.~\ref{fig:v3-anexo-4}, \ref{fig:v3-anexo-5} \\
-    R-USA-7 (Tabla~\ref{tab:requisitos-usabilidad}) & Alerta roja inline para código de verificación \texttt{000000} y banner superior de error de red con botón \textit{Reintentar}. & Figs.~\ref{fig:v3-error-codigo-movil}, \ref{fig:v3-error-red} \\
-    R-USA-8 (Tabla~\ref{tab:requisitos-usabilidad}) & Indicador continuo \textit{Guardado automático} con icono en todos los pasos de evaluación. & Fig.~\ref{fig:v3-evaluacion-web} \\
+    R-USA-2 (Tabla~\ref{tab:requisitos-usabilidad}) & Unificación de \textit{Mejora tu puntuación} en enlaces, menú y cabecera; \textit{Guías} como \texttt{h1} y \textit{Aprende en 1 minuto} como subtítulo. & Fig.~\ref{fig:v3-plan-guias} \\
+    R-USA-3 (Tabla~\ref{tab:requisitos-usabilidad}) & Eliminación de tarjetas redundantes en Principal e integración de \textit{Mejora tu puntuación} junto a \textit{Ver mi huella digital}. & Fig.~\ref{fig:v3-principal} \\
+    R-USA-4 (Tabla~\ref{tab:requisitos-usabilidad}) & Filtros \textit{Todas / Pendientes / Completadas} y selector de ordenación por impacto en puntos. & Fig.~\ref{fig:v3-plan-web} \\
+    R-USA-5 (Tabla~\ref{tab:requisitos-usabilidad}) & Atajos \texttt{Shift+1..5}, \texttt{?}, \texttt{Esc} (pausados en campos de entrada) y diálogo renovado de \textit{Atajos de teclado}. & Fig.~\ref{fig:v3-atajos-modal} \\
+    R-USA-6 (Tabla~\ref{tab:requisitos-usabilidad}) & Diálogos modales \texttt{alertdialog} antes de \textit{Borrar mis datos y cuenta} y \textit{Retirar su acceso}. & Fig.~\ref{fig:v3-anexo-4} \\
+    R-USA-7 (Tabla~\ref{tab:requisitos-usabilidad}) & Foco automático ante errores en registro, alerta inline con código \texttt{000000} y banner superior de error de red. & Figs.~\ref{fig:v3-errores-autoguardado}, \ref{fig:v3-error-red} \\
+    R-USA-8 (Tabla~\ref{tab:requisitos-usabilidad}) & Indicador continuo \textit{Guardado automático} con icono en todos los pasos de evaluación. & Figs.~\ref{fig:v3-evaluacion-ac-web}, \ref{fig:v3-anexo-2} \\
     \midrule
-    R-ACC-1 (Tabla~\ref{tab:requisitos-accesibilidad}) & Traducción íntegra ES/EN; selector \texttt{ES | EN} en bienvenida y registro y desplegable en \textit{Accesibilidad}. & Figs.~\ref{fig:v3-principal-en}, \ref{fig:v3-accesibilidad}, \ref{fig:v3-anexo-1} \\
-    R-ACC-2 (Tabla~\ref{tab:requisitos-accesibilidad}) & Oscurecimiento de textos secundarios (\texttt{--muted-foreground}) en marcas temporales, ayudas y opciones. & Figs.~\ref{fig:v3-principal}, \ref{fig:v3-evaluacion-web} \\
-    R-ACC-3 (Tabla~\ref{tab:requisitos-accesibilidad}) & Controles independientes de tamaño (\textit{100\,\%, 125\,\%, 150\,\%}), tema (\textit{Claro / Oscuro}) y \textit{Alto contraste} en 4 combinaciones. & Figs.~\ref{fig:v3-accesibilidad}, \ref{fig:v3-modos-web}, \ref{fig:v3-alto-contraste} \\
-    Validadores (CCA / WAVE) & Contraste en botones de cierre \texttt{X}, tarjeta roja de filtraciones, botones de limpieza, píldoras de guías, consistencia en cuestionario/plan y \texttt{<header>} en Principal. & Figs.~\ref{fig:v3-plan-guias}, \ref{fig:v3-anexo-2}, \ref{fig:v3-anexo-3} \\
+    R-ACC-1 (Tabla~\ref{tab:requisitos-accesibilidad}) & Traducción íntegra ES/EN mediante selector en bienvenida/registro y desplegable en \textit{Accesibilidad}. & Figs.~\ref{fig:v3-accesibilidad}, \ref{fig:v3-modos-web}, \ref{fig:v3-anexo-1} \\
+    R-ACC-2 (Tabla~\ref{tab:requisitos-accesibilidad}) & Oscurecimiento de textos secundarios (\texttt{--muted-foreground}) en marcas temporales, ayudas y opciones. & Figs.~\ref{fig:v3-principal}, \ref{fig:v3-evaluacion-ac-web} \\
+    R-ACC-3 (Tabla~\ref{tab:requisitos-accesibilidad}) & Controles independientes de tamaño (\textit{100\,\%, 125\,\%, 150\,\%}), tema (\textit{Claro / Oscuro}) y \textit{Alto contraste} en toda la aplicación. & Figs.~\ref{fig:v3-principal}, \ref{fig:v3-accesibilidad}, \ref{fig:v3-anexo-3} \\
+    Validadores (CCA / WAVE) & Contraste en botones de cierre \texttt{X}, alertas rojas en oscuro, botones de limpieza, píldoras y \texttt{<header>} en Principal. & Figs.~\ref{fig:v3-plan-guias}, \ref{fig:v3-modos-web}, \ref{fig:v3-anexo-2} \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 % ============================================================================
-% Anexo completo de pantallas v3.0
+% Anexo completo de pantallas v3.0 (sin redundancias web/móvil)
 % ============================================================================
 \newpage
 \section{Anexo: Pantallas completas del prototipo v3.0}
 \label{sec:anexo-v3}
 
-En este anexo se recoge la totalidad de las pantallas y estados interactivos que componen el prototipo \textbf{Ctrl+Me v3.0}, completando las vistas principales presentadas en la Sección~\ref{sec:prototipos-v3}.
+En este anexo se recoge el resto de pantallas, flujos y combinaciones de idioma y tema que completan la cobertura del prototipo \textbf{Ctrl+Me v3.0}, combinando capturas web y móviles representativas de cada vista para evitar duplicidades innecesarias.
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.30\textwidth}
+  \begin{subfigure}[b]{0.27\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_bienvenida_en_movil.png}
     \caption{Bienvenida en inglés con selector ES | EN (móvil)}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.64\textwidth}
+  \begin{subfigure}[b]{0.27\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_email_web.png}
-    \caption{Configuración inicial (Paso 1 de 3)}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_error_foco_movil.png}
+    \caption{Foco automático en error de correo (Paso 1, móvil)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_conectar_en_web.png}
+    \caption{Ampliación del análisis en inglés (Paso 3, web)}
   \end{subfigure}
   \\[0.75em]
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_error_codigo_web.png}
-    \caption{Verificación y error en código \texttt{000000} (Paso 2 de 3)}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_analisis_web.png}
+    \caption{Análisis inicial completado (web)}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_onboarding_conectar_web.png}
-    \caption{Ampliación del análisis (Paso 3 de 3)}
-  \end{subfigure}
-  \caption{Flujo de bienvenida y configuración inicial en v3.0.}
+  \caption{Pantallas complementarias de bienvenida bilingüe, foco de validación en registro y análisis inicial (v3.0).}
   \label{fig:v3-anexo-1}
 \end{figure}
 
@@ -295,28 +263,28 @@ En este anexo se recoge la totalidad de las pantallas y estados interactivos que
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_analisis_web.png}
-    \caption{Análisis inicial completado}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_huella_web.png}
+    \caption{Categorías de Tu huella digital (web)}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_huella_web.png}
-    \caption{Categorías de Tu huella digital}
-  \end{subfigure}
-  \\[0.75em]
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_huella_modal_web.png}
-    \caption{Detalle de categoría con botón \texttt{X} contrastado y pasos legibles}
+    \caption{Detalle de categoría con botón \texttt{X} contrastado (web)}
+  \end{subfigure}
+  \\[0.75em]
+  \begin{subfigure}[b]{0.30\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figuras-v3/v3_limpieza_en_movil.png}
+    \caption{Limpieza digital en inglés (móvil)}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.64\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_evaluacion_revision_web.png}
-    \caption{Revisión de respuestas (Paso 6 de 6) con autoguardado}
+    \caption{Revisión de respuestas (Paso 6 de 6) con autoguardado (web)}
   \end{subfigure}
-  \caption{Análisis, detalle de huella digital y revisión final de evaluación en v3.0.}
+  \caption{Huella digital, limpieza móvil en inglés y revisión final de evaluación en v3.0.}
   \label{fig:v3-anexo-2}
 \end{figure}
 
@@ -324,103 +292,56 @@ En este anexo se recoge la totalidad de las pantallas y estados interactivos que
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_limpieza_web.png}
-    \caption{Limpieza digital con botones claramente diferenciados}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_alertas_en_web.png}
+    \caption{Alertas de filtraciones en inglés (web)}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.27\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_alertas_web.png}
-    \caption{Alertas de filtraciones con contraste AA en textos secundarios}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_historia_movil.png}
+    \caption{Historia visual multimodal (móvil)}
   \end{subfigure}
   \\[0.75em]
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_guias_web.png}
-    \caption{Catálogo \textit{Guías} con píldoras de alto contraste (web)}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_asistente_oscuro_web.png}
+    \caption{Asistente conversacional en modo oscuro (web)}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_historia_web.png}
-    \caption{Reproductor multimodal de historia visual}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_limpieza_oscuro_alto_contraste_web.png}
+    \caption{Limpieza en oscuro y alto contraste (web)}
   \end{subfigure}
-  \caption{Limpieza digital, alertas de filtraciones y guías educativas en v3.0.}
+  \caption{Alertas en inglés, reproductor multimodal, asistente en modo oscuro y limpieza en oscuro con alto contraste.}
   \label{fig:v3-anexo-3}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.30\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_circulo_web.png}
-    \caption{Vista principal de Mi círculo}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_circulo_claro_alto_contraste_movil.png}
+    \caption{Mi círculo en claro y alto contraste (móvil)}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.64\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_circulo_confirmar_web.png}
-    \caption{Confirmación modal al retirar acceso (R-USA-6)}
+    \caption{Confirmación modal al retirar acceso en Mi círculo (web)}
   \end{subfigure}
   \\[0.75em]
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_circulo_detalle_web.png}
-    \caption{Detalle de contacto supervisado en Mi círculo}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_circulo_anadir_web.png}
-    \caption{Formulario para añadir persona a Mi círculo}
-  \end{subfigure}
-  \caption{Gestión completa de \textit{Mi círculo} y confirmación de retirada de acceso en v3.0.}
-  \label{fig:v3-anexo-4}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_asistente_web.png}
-    \caption{Asistente de identidad digital}
+    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_confirmar_borrar_web.png}
+    \caption{Confirmación modal al borrar cuenta y datos (web)}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figuras-v3/v3_sesiones_web.png}
-    \caption{Revisión guiada de sesiones}
+    \caption{Revisión guiada de sesiones desde el asistente (web)}
   \end{subfigure}
-  \\[0.75em]
-  \begin{subfigure}[b]{0.64\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_perfil_confirmar_borrar_web.png}
-    \caption{Confirmación modal al borrar cuenta y datos (R-USA-6)}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.30\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_guias_movil.png}
-    \caption{Guías en móvil}
-  \end{subfigure}
-  \caption{Asistente, revisión guiada, confirmación de borrado y vista móvil de guías en v3.0.}
-  \label{fig:v3-anexo-5}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.30\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_evaluacion_movil.png}
-    \caption{Evaluación de huella en móvil con autoguardado}
-    \label{fig:v3-evaluacion-movil}
-  \end{subfigure}
-  \hspace{1.5em}
-  \begin{subfigure}[b]{0.30\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figuras-v3/v3_principal_alto_contraste_150_movil.png}
-    \caption{Vista móvil con alto contraste y texto al 150\,\%}
-  \end{subfigure}
-  \caption{Comprobación móvil adicional de evaluación y escalado accesible al 150\,\%.}
-  \label{fig:v3-anexo-6}
+  \caption{Gestión de \textit{Mi círculo} con alto contraste, confirmaciones modales (\texttt{R-USA-6}) y revisión de sesiones.}
+  \label{fig:v3-anexo-4}
 \end{figure}

@@ -34,7 +34,7 @@ type Step = 'welcome' | 'email' | 'code' | 'connect' | 'scan'
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export const fieldClass =
-  'h-13 w-full rounded-2xl border border-input bg-card px-4 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/40 aria-invalid:border-destructive aria-invalid:ring-destructive/20'
+  'h-13 w-full rounded-2xl border border-input bg-card px-4 text-base transition-colors placeholder:text-muted-foreground focus:border-primary focus:outline-3 focus:outline-offset-2 focus:outline-ring focus:ring-3 focus:ring-ring/35 aria-invalid:border-destructive aria-invalid:focus:border-destructive aria-invalid:focus:outline-ring'
 
 export function OnboardingFlow() {
   const { completeOnboarding } = useIdentity()
@@ -243,13 +243,17 @@ function EmailStep({
   const [email, setEmail] = useState(initialEmail)
   const [consent, setConsent] = useState(Boolean(initialEmail))
   const [errors, setErrors] = useState<{ email?: string; consent?: string }>({})
+  const [submitSeq, setSubmitSeq] = useState(0)
   const emailRef = useRef<HTMLInputElement>(null)
   const consentRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (errors.email) emailRef.current?.focus()
-    else if (errors.consent) consentRef.current?.focus()
-  }, [errors])
+    if (submitSeq === 0) return
+    const target = errors.email ? emailRef.current : errors.consent ? consentRef.current : null
+    if (!target) return
+    target.scrollIntoView({ block: 'center', behavior: 'instant' })
+    target.focus({ preventScroll: true })
+  }, [errors, submitSeq])
 
   return (
     <form
@@ -261,7 +265,11 @@ function EmailStep({
         if (!EMAIL_PATTERN.test(email.trim())) next.email = copyText('Escribe un correo válido, por ejemplo nombre@gmail.com', 'Enter a valid email address, such as name@gmail.com', isV3, language)
         if (!consent) next.consent = copyText('Necesitamos tu permiso para buscar este correo.', 'We need your permission to search for this email address.', isV3, language)
         setErrors(next)
-        if (Object.keys(next).length === 0) onSubmit(name.trim(), email.trim().toLowerCase())
+        if (Object.keys(next).length > 0) {
+          setSubmitSeq((n) => n + 1)
+          return
+        }
+        onSubmit(name.trim(), email.trim().toLowerCase())
       }}
     >
       <div className="-mx-6">
@@ -298,7 +306,13 @@ function EmailStep({
           autoCapitalize="none"
           spellCheck={false}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value
+            setEmail(val)
+            if (errors.email && EMAIL_PATTERN.test(val.trim())) {
+              setErrors((prev) => ({ ...prev, email: undefined }))
+            }
+          }}
           placeholder="nombre@gmail.com"
           aria-invalid={errors.email ? true : undefined}
           aria-describedby={errors.email ? `${id}-email-error` : `${id}-email-hint`}
@@ -315,12 +329,23 @@ function EmailStep({
         </p>
       )}
 
-      <label className="relative mt-6 flex cursor-pointer items-start gap-3 rounded-2xl bg-secondary/60 p-4 has-focus-visible:ring-3 has-focus-visible:ring-ring/40">
+      <label
+        className={cn(
+          'relative mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border-2 bg-secondary/60 p-4 transition-colors has-focus:outline-3 has-focus:outline-offset-2 has-focus:outline-ring has-focus:ring-3 has-focus:ring-ring/35 has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
+          errors.consent ? 'border-destructive bg-destructive-soft/40' : 'border-transparent',
+        )}
+      >
         <input
           ref={consentRef}
           type="checkbox"
           checked={consent}
-          onChange={(e) => setConsent(e.target.checked)}
+          onChange={(e) => {
+            const checked = e.target.checked
+            setConsent(checked)
+            if (errors.consent && checked) {
+              setErrors((prev) => ({ ...prev, consent: undefined }))
+            }
+          }}
           required
           aria-invalid={errors.consent ? true : undefined}
           aria-describedby={errors.consent ? `${id}-consent-error` : undefined}
@@ -328,7 +353,10 @@ function EmailStep({
         />
         <span
           aria-hidden="true"
-          className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 border-input bg-card transition-colors peer-checked:border-primary peer-checked:bg-primary"
+          className={cn(
+            'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 bg-card transition-colors peer-checked:border-primary peer-checked:bg-primary peer-focus:ring-2 peer-focus:ring-ring',
+            errors.consent ? 'border-destructive' : 'border-input',
+          )}
         >
           <Check className={cn('size-3.5 text-primary-foreground', !consent && 'opacity-0')} strokeWidth={3} />
         </span>

@@ -156,6 +156,16 @@ export function PrototypeControls() {
   const router = useRouter()
 
   useEffect(() => {
+    const onSimulateNetworkError = () => {
+      setShowShortcuts(false)
+      setRetryComplete(false)
+      setNetworkError(true)
+    }
+    window.addEventListener('ctrlme:simulate-network-error', onSimulateNetworkError)
+    return () => window.removeEventListener('ctrlme:simulate-network-error', onSimulateNetworkError)
+  }, [setShowShortcuts])
+
+  useEffect(() => {
     if (!retryComplete) return
     const timer = window.setTimeout(() => setRetryComplete(false), 4000)
     return () => window.clearTimeout(timer)
@@ -210,7 +220,7 @@ export function PrototypeControls() {
           'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ),
       )
-    getFocusable()[0]?.focus()
+    dialog.focus()
     const trapTab = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return
       const items = getFocusable()
@@ -352,65 +362,98 @@ export function PrototypeControls() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="shortcuts-title"
-            className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-2xl"
+            tabIndex={-1}
+            className="w-full max-w-lg rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-2xl focus:outline-none"
           >
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold tracking-widest text-primary uppercase">Ctrl+Me v3.0</p>
-                <h2 id="shortcuts-title" className="mt-1 font-serif text-3xl">
-                  {isEn ? 'Keyboard shortcuts' : 'Atajos de teclado'}
-                </h2>
+              <div className="flex items-start gap-3.5">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+                  <Keyboard className="size-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">Ctrl+Me v3.0</p>
+                  <h2 id="shortcuts-title" className="mt-0.5 font-serif text-3xl leading-tight">
+                    {isEn ? 'Keyboard shortcuts' : 'Atajos de teclado'}
+                  </h2>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowShortcuts(false)}
                 aria-label={isEn ? 'Close' : 'Cerrar'}
-                className="flex size-10 items-center justify-center rounded-full border border-border bg-muted text-foreground hover:bg-border"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted"
               >
                 <X className="size-5" aria-hidden="true" />
               </button>
             </div>
-            <h3 className="mt-6 text-sm font-semibold">{isEn ? 'Quick shortcuts' : 'Atajos rápidos'}</h3>
-            <dl className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2 text-sm">
-              <dt>{isEn ? 'Home / Cleanup / Alerts / Guides / Profile' : 'Principal / Limpieza / Alertas / Guías / Mi perfil'}</dt>
-              <dd>
-                <kbd>Shift+1…5</kbd>
-              </dd>
-              <dt>{isEn ? 'Open this guide' : 'Abrir esta guía'}</dt>
-              <dd>
-                <kbd>?</kbd>
-              </dd>
-              <dt>{isEn ? 'Close window' : 'Cerrar ventana'}</dt>
-              <dd>
-                <kbd>Esc</kbd>
-              </dd>
-            </dl>
-            <h3 className="mt-6 text-sm font-semibold">{isEn ? 'Standard navigation' : 'Navegación estándar'}</h3>
-            <dl className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2 text-sm">
-              <dt>{isEn ? 'Move through controls' : 'Avanzar por controles'}</dt>
-              <dd>
-                <kbd>Tab</kbd>
-              </dd>
-              <dt>{isEn ? 'Move backwards' : 'Retroceder'}</dt>
-              <dd>
-                <kbd>Shift+Tab</kbd>
-              </dd>
-              <dt>{isEn ? 'Activate' : 'Activar'}</dt>
-              <dd>
-                <kbd>Enter</kbd> / <kbd>{isEn ? 'Space' : 'Espacio'}</kbd>
-              </dd>
-            </dl>
-            <button
-              type="button"
-              onClick={() => {
-                setShowShortcuts(false)
-                setRetryComplete(false)
-                setNetworkError(true)
-              }}
-              className="mt-6 min-h-10 rounded-xl border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              {isEn ? 'Test connection alert' : 'Probar aviso de conexión'}
-            </button>
+
+            <div className="mt-6 space-y-5">
+              <div>
+                <h3 className="px-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  {isEn ? 'Quick shortcuts' : 'Atajos rápidos'}
+                </h3>
+                <dl className="mt-2 divide-y divide-border/70 rounded-2xl border border-border bg-muted/35 text-sm">
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">
+                      {isEn ? 'Home, Cleanup, Alerts, Guides, Profile' : 'Principal, Limpieza, Alertas, Guías y Mi perfil'}
+                    </dt>
+                    <dd className="flex shrink-0 items-center gap-1">
+                      <kbd>Shift</kbd>
+                      <span aria-hidden="true" className="text-xs text-muted-foreground">+</span>
+                      <kbd>1–5</kbd>
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">{isEn ? 'Open this guide' : 'Abrir esta guía'}</dt>
+                    <dd className="shrink-0">
+                      <kbd>?</kbd>
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">{isEn ? 'Close dialog' : 'Cerrar ventana'}</dt>
+                    <dd className="shrink-0">
+                      <kbd>Esc</kbd>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div>
+                <h3 className="px-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  {isEn ? 'Standard navigation' : 'Navegación estándar'}
+                </h3>
+                <dl className="mt-2 divide-y divide-border/70 rounded-2xl border border-border bg-muted/35 text-sm">
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">{isEn ? 'Move forward' : 'Avanzar por controles'}</dt>
+                    <dd className="shrink-0">
+                      <kbd>Tab</kbd>
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">{isEn ? 'Move backwards' : 'Retroceder'}</dt>
+                    <dd className="flex shrink-0 items-center gap-1">
+                      <kbd>Shift</kbd>
+                      <span aria-hidden="true" className="text-xs text-muted-foreground">+</span>
+                      <kbd>Tab</kbd>
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 px-4 py-3">
+                    <dt className="font-medium">{isEn ? 'Activate control' : 'Activar elemento'}</dt>
+                    <dd className="flex shrink-0 items-center gap-1.5">
+                      <kbd>Enter</kbd>
+                      <span aria-hidden="true" className="text-xs text-muted-foreground">/</span>
+                      <kbd>{isEn ? 'Space' : 'Espacio'}</kbd>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              {isEn
+                ? 'Quick shortcuts pause automatically while typing inside a text field.'
+                : 'Los atajos rápidos se desactivan automáticamente cuando escribes en un campo de texto.'}
+            </p>
           </section>
         </div>
       ) : null}

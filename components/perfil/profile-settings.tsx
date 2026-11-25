@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -38,6 +38,7 @@ export function ProfileSettings() {
   const [newEmail, setNewEmail] = useState('')
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const newEmailRef = useRef<HTMLInputElement>(null)
 
   const prefsFor = (key: string): AlertPrefs => state.alertRouting[key] ?? defaultAlertPrefs(key)
   const setPref = (key: string, patch: Partial<AlertPrefs>) =>
@@ -50,8 +51,16 @@ export function ProfileSettings() {
 
   const addEmail = () => {
     const address = newEmail.trim().toLowerCase()
-    if (!EMAIL_PATTERN.test(address)) return setError('Escribe un correo válido.')
-    if (identity.emails.some((e) => e.address === address)) return setError('Ya estás vigilando este correo.')
+    if (!EMAIL_PATTERN.test(address)) {
+      setError('Escribe un correo válido.')
+      requestAnimationFrame(() => newEmailRef.current?.focus())
+      return
+    }
+    if (identity.emails.some((e) => e.address === address)) {
+      setError('Ya estás vigilando este correo.')
+      requestAnimationFrame(() => newEmailRef.current?.focus())
+      return
+    }
     update((s) => ({ ...s, identity: { ...s.identity, emails: [...s.identity.emails, { address, verified: false }] } }))
     setNewEmail('')
     setError('')
@@ -165,6 +174,7 @@ export function ProfileSettings() {
               {copy('Nuevo correo')}
             </label>
             <input
+              ref={newEmailRef}
               id={`${id}-new`}
               type="email"
               inputMode="email"
